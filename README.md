@@ -1,7 +1,7 @@
 behavior3erl
 =====
 
-Behavior3 by erlang library
+Behavior tree implementation in Erlang
 
 Build
 -----

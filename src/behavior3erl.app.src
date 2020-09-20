@@ -1,5 +1,5 @@
 {application, behavior3erl,
- [{description, "Behavior3 by erlang library"},
+ [{description, "Behavior tree implementation in Erlang"},
   {vsn, "0.1.0"},
   {registered, []},
   {applications,
