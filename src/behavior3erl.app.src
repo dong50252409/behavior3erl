@@ -1,5 +1,5 @@
 {application, behavior3erl,
- [{description, "Behavior tree implementation in Erlang"},
+ [{description, "Behavior3 by erlang library"},
   {vsn, "0.1.0"},
   {registered, []},
   {applications,
@@ -8,7 +8,6 @@
    ]},
   {env,[]},
   {modules, []},
-
-  {licenses, ["Apache 2.0"]},
-  {links, []}
+  {licenses,["MIT"]}
+  {links, [{"GitHub", "https://github.com/dong50252409/behavior3erl"}]}]}.
  ]}.
