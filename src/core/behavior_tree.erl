@@ -25,7 +25,7 @@ load_tree_file(JsonConfig) ->
             JsonTerm = jsx:decode(Json, [return_maps]),
             parse_btree(JsonTerm);
         {error, Reason} ->
-            ?BT_LOG("Error:~w Reason:~w JsonConfig:~w", [error, Reason, JsonConfig]),
+            ?BT_LOG("Error:~w Reason:~w JsonConfig:~ts", [error, Reason, JsonConfig]),
             {error, Reason}
     end.
 
