@@ -1,0 +1,1786 @@
+{
+  "version": "0.3.0",
+  "scope": "project",
+  "selectedTree": "1bbac5e1-753c-4f30-8fef-6db07a54746a",
+  "trees": [
+    {
+      "version": "0.3.0",
+      "scope": "tree",
+      "id": "9da29574-2f80-4d31-98ba-eafd8a29b6bc",
+      "title": "巡逻兵巡逻逻辑",
+      "description": "",
+      "root": "8bf79ff6-a1e8-4f45-8342-82c4ecccc68e",
+      "properties": {},
+      "nodes": {
+        "8bf79ff6-a1e8-4f45-8342-82c4ecccc68e": {
+          "id": "8bf79ff6-a1e8-4f45-8342-82c4ecccc68e",
+          "name": "MemSequence",
+          "category": "composite",
+          "title": "MemSequence",
+          "description": "",
+          "properties": {},
+          "display": {
+            "x": 48,
+            "y": -132
+          },
+          "children": [
+            "11f48f39-e5d0-4697-9f06-457eff8cea3e",
+            "ea4f98b0-8be8-4cda-b9b3-182a3b8c8ec3"
+          ]
+        },
+        "ea4f98b0-8be8-4cda-b9b3-182a3b8c8ec3": {
+          "id": "ea4f98b0-8be8-4cda-b9b3-182a3b8c8ec3",
+          "name": "Sequence",
+          "category": "composite",
+          "title": "Sequence",
+          "description": "",
+          "properties": {},
+          "display": {
+            "x": 252,
+            "y": 60
+          },
+          "children": [
+            "3ea60740-694d-4486-b692-fc0b4d4d6057",
+            "2a291d2b-91e3-4f5b-886b-7205861cb480",
+            "0d2b4c05-f854-40f3-864b-990bffe2b50b"
+          ]
+        },
+        "3ea60740-694d-4486-b692-fc0b4d4d6057": {
+          "id": "3ea60740-694d-4486-b692-fc0b4d4d6057",
+          "name": "Inverter",
+          "category": "decorator",
+          "title": "Inverter",
+          "description": "",
+          "properties": {},
+          "display": {
+            "x": 468,
+            "y": -60
+          },
+          "child": "c46a8f97-4d9b-4491-9ae5-61876186d2e0"
+        },
+        "2a291d2b-91e3-4f5b-886b-7205861cb480": {
+          "id": "2a291d2b-91e3-4f5b-886b-7205861cb480",
+          "name": "action_move_grid",
+          "category": "action",
+          "title": "移动一格",
+          "description": "action_move_grid\n移动一格\n返回：SUCCESS",
+          "properties": {},
+          "display": {
+            "x": 468,
+            "y": 72
+          }
+        },
+        "c46a8f97-4d9b-4491-9ae5-61876186d2e0": {
+          "id": "c46a8f97-4d9b-4491-9ae5-61876186d2e0",
+          "name": "Sequence",
+          "category": "composite",
+          "title": "Sequence",
+          "description": "",
+          "properties": {},
+          "display": {
+            "x": 672,
+            "y": -60
+          },
+          "children": [
+            "4bd05aea-40b4-4b6f-a8c4-c3c29020f21a",
+            "8c3497d7-0b53-43d7-9215-3f13ff44d223"
+          ]
+        },
+        "4bd05aea-40b4-4b6f-a8c4-c3c29020f21a": {
+          "id": "4bd05aea-40b4-4b6f-a8c4-c3c29020f21a",
+          "name": "cond_is_dest",
+          "category": "condition",
+          "title": "到达终点",
+          "description": "cond_is_dest\n判断是否到达终点\n是：SUCCESS\n否：FAILURE",
+          "properties": {},
+          "display": {
+            "x": 876,
+            "y": -108
+          }
+        },
+        "0d2b4c05-f854-40f3-864b-990bffe2b50b": {
+          "id": "0d2b4c05-f854-40f3-864b-990bffe2b50b",
+          "name": "Runner",
+          "category": "action",
+          "title": "Runner",
+          "description": "",
+          "properties": {},
+          "display": {
+            "x": 468,
+            "y": 156
+          }
+        },
+        "8c3497d7-0b53-43d7-9215-3f13ff44d223": {
+          "id": "8c3497d7-0b53-43d7-9215-3f13ff44d223",
+          "name": "action_finish",
+          "category": "action",
+          "title": "游戏<is_win>",
+          "description": "action_finish\n游戏结束，根据is_win属性打印结果\n打印结果，结束行为树运行\n返回：SUCCESS",
+          "properties": {
+            "is_win": "胜利"
+          },
+          "display": {
+            "x": 876,
+            "y": -12
+          }
+        },
+        "11f48f39-e5d0-4697-9f06-457eff8cea3e": {
+          "id": "11f48f39-e5d0-4697-9f06-457eff8cea3e",
+          "name": "action_collect_dest_path",
+          "category": "action",
+          "title": "收集终点路径",
+          "description": "action_collect_dest_path\n收集终点路径\n返回：SUCCESS",
+          "properties": {},
+          "display": {
+            "x": 252,
+            "y": -192
+          }
+        }
+      },
+      "display": {
+        "camera_x": 550,
+        "camera_y": 562.5,
+        "camera_z": 1,
+        "x": -156,
+        "y": -132
+      }
+    },
+    {
+      "version": "0.3.0",
+      "scope": "tree",
+      "id": "c084afd6-c72b-40fc-88a8-9c4445771fc6",
+      "title": "巡逻兵主动AI",
+      "description": "",
+      "root": "2b5aaee3-9b28-4925-8a8b-b21236788844",
+      "properties": {},
+      "nodes": {
+        "2b5aaee3-9b28-4925-8a8b-b21236788844": {
+          "id": "2b5aaee3-9b28-4925-8a8b-b21236788844",
+          "name": "Priority",
+          "category": "composite",
+          "title": "Priority",
+          "description": "",
+          "properties": {},
+          "display": {
+            "x": 204,
+            "y": 0
+          },
+          "children": [
+            "03643393-9519-41c5-a5fc-5d2e68ad13c7",
+            "af215e32-e4d5-45a9-8511-cd4d0bcea761",
+            "253accf9-14bb-450a-b562-02e9a528b20b",
+            "7673cc91-2cbe-4c17-a57a-2c7d614ffb37"
+          ]
+        },
+        "5c18cf59-642f-4e99-9847-242df72579d6": {
+          "id": "5c18cf59-642f-4e99-9847-242df72579d6",
+          "name": "b7eea887-72c9-4462-8d74-83c13ac82fba",
+          "category": "tree",
+          "title": "巡逻兵攻击逻辑",
+          "description": "",
+          "properties": {},
+          "display": {
+            "x": 624,
+            "y": 132
+          }
+        },
+        "060b2c7a-aebb-46e1-8f56-288264ba61e4": {
+          "id": "060b2c7a-aebb-46e1-8f56-288264ba61e4",
+          "name": "cond_is_idle",
+          "category": "condition",
+          "title": "是空闲状态",
+          "description": "cond_is_idle\n判断是否处于空闲状态\n是：SUCCESS\n否：FAILURE",
+          "properties": {},
+          "display": {
+            "x": 624,
+            "y": -312
+          }
+        },
+        "03643393-9519-41c5-a5fc-5d2e68ad13c7": {
+          "id": "03643393-9519-41c5-a5fc-5d2e68ad13c7",
+          "name": "Sequence",
+          "category": "composite",
+          "title": "Sequence",
+          "description": "",
+          "properties": {},
+          "display": {
+            "x": 408,
+            "y": -264
+          },
+          "children": [
+            "060b2c7a-aebb-46e1-8f56-288264ba61e4",
+            "4a111c90-18b7-4af8-88b9-13caf316d72a"
+          ]
+        },
+        "7631d5cb-0820-42e6-a3fa-c7a368f71312": {
+          "id": "7631d5cb-0820-42e6-a3fa-c7a368f71312",
+          "name": "action_become_patrolling",
+          "category": "action",
+          "title": "变为巡逻状态",
+          "description": "action_become_patrolling\n变为巡逻状态\n返回：SUCCESS",
+          "properties": {},
+          "display": {
+            "x": 828,
+            "y": -228
+          }
+        },
+        "df3825c5-5d6f-4a0d-88b7-d54a277c4a52": {
+          "id": "df3825c5-5d6f-4a0d-88b7-d54a277c4a52",
+          "name": "9da29574-2f80-4d31-98ba-eafd8a29b6bc",
+          "category": "tree",
+          "title": "巡逻兵巡逻逻辑",
+          "description": "",
+          "properties": {},
+          "display": {
+            "x": 624,
+            "y": -48
+          }
+        },
+        "4a111c90-18b7-4af8-88b9-13caf316d72a": {
+          "id": "4a111c90-18b7-4af8-88b9-13caf316d72a",
+          "name": "Inverter",
+          "category": "decorator",
+          "title": "Inverter",
+          "description": "",
+          "properties": {},
+          "display": {
+            "x": 624,
+            "y": -228
+          },
+          "child": "7631d5cb-0820-42e6-a3fa-c7a368f71312"
+        },
+        "b671173e-6347-44ee-8253-5f41d65f48a3": {
+          "id": "b671173e-6347-44ee-8253-5f41d65f48a3",
+          "name": "cond_is_patrolling",
+          "category": "condition",
+          "title": "是巡逻状态",
+          "description": "cond_is_patrolling\n判断是否处于巡逻状态\n是：SUCCESS\n否：FAILURE",
+          "properties": {},
+          "display": {
+            "x": 624,
+            "y": -132
+          }
+        },
+        "af215e32-e4d5-45a9-8511-cd4d0bcea761": {
+          "id": "af215e32-e4d5-45a9-8511-cd4d0bcea761",
+          "name": "Sequence",
+          "category": "composite",
+          "title": "Sequence",
+          "description": "",
+          "properties": {},
+          "display": {
+            "x": 408,
+            "y": -96
+          },
+          "children": [
+            "b671173e-6347-44ee-8253-5f41d65f48a3",
+            "df3825c5-5d6f-4a0d-88b7-d54a277c4a52"
+          ]
+        },
+        "253accf9-14bb-450a-b562-02e9a528b20b": {
+          "id": "253accf9-14bb-450a-b562-02e9a528b20b",
+          "name": "Sequence",
+          "category": "composite",
+          "title": "Sequence",
+          "description": "",
+          "properties": {},
+          "display": {
+            "x": 408,
+            "y": 84
+          },
+          "children": [
+            "36527522-a9df-44e6-8179-0503e731bdc4",
+            "5c18cf59-642f-4e99-9847-242df72579d6"
+          ]
+        },
+        "36527522-a9df-44e6-8179-0503e731bdc4": {
+          "id": "36527522-a9df-44e6-8179-0503e731bdc4",
+          "name": "cond_is_attacking",
+          "category": "condition",
+          "title": "是攻击状态",
+          "description": "cond_is_attacking\n判断是否处于攻击状态\n是：SUCCESS\n否：FAILURE",
+          "properties": {},
+          "display": {
+            "x": 624,
+            "y": 36
+          }
+        },
+        "730ae916-ec3f-4bfe-b577-0c9545792e72": {
+          "id": "730ae916-ec3f-4bfe-b577-0c9545792e72",
+          "name": "a62217c8-655c-4266-9405-4ffcdbb4360d",
+          "category": "tree",
+          "title": "巡逻兵恢复逻辑",
+          "description": "",
+          "properties": {},
+          "display": {
+            "x": 624,
+            "y": 300
+          }
+        },
+        "7673cc91-2cbe-4c17-a57a-2c7d614ffb37": {
+          "id": "7673cc91-2cbe-4c17-a57a-2c7d614ffb37",
+          "name": "Sequence",
+          "category": "composite",
+          "title": "Sequence",
+          "description": "",
+          "properties": {},
+          "display": {
+            "x": 408,
+            "y": 264
+          },
+          "children": [
+            "0304627c-6944-435e-9c8d-4e4cb2062435",
+            "730ae916-ec3f-4bfe-b577-0c9545792e72"
+          ]
+        },
+        "0304627c-6944-435e-9c8d-4e4cb2062435": {
+          "id": "0304627c-6944-435e-9c8d-4e4cb2062435",
+          "name": "cond_is_recovering",
+          "category": "condition",
+          "title": "是恢复状态",
+          "description": "cond_is_recovering\n判断是否处于恢复状态\n是：SUCCESS\n否：FAILURE",
+          "properties": {},
+          "display": {
+            "x": 624,
+            "y": 216
+          }
+        }
+      },
+      "display": {
+        "camera_x": 485,
+        "camera_y": 519.5,
+        "camera_z": 1,
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "version": "0.3.0",
+      "scope": "tree",
+      "id": "b7eea887-72c9-4462-8d74-83c13ac82fba",
+      "title": "巡逻兵攻击逻辑",
+      "description": "",
+      "root": "cf2ef19d-fbd1-4c7c-80b6-0b3a5c355598",
+      "properties": {},
+      "nodes": {
+        "cf2ef19d-fbd1-4c7c-80b6-0b3a5c355598": {
+          "id": "cf2ef19d-fbd1-4c7c-80b6-0b3a5c355598",
+          "name": "Sequence",
+          "category": "composite",
+          "title": "Sequence",
+          "description": "",
+          "properties": {},
+          "display": {
+            "x": 204,
+            "y": 0
+          },
+          "children": [
+            "8f21ebb2-ccd8-4938-8d50-753b2251e60c",
+            "9f376dff-8225-4718-8895-193b4bb3d613"
+          ]
+        },
+        "8f21ebb2-ccd8-4938-8d50-753b2251e60c": {
+          "id": "8f21ebb2-ccd8-4938-8d50-753b2251e60c",
+          "name": "Inverter",
+          "category": "decorator",
+          "title": "Inverter",
+          "description": "",
+          "properties": {},
+          "display": {
+            "x": 408,
+            "y": -264
+          },
+          "child": "5588cee3-28b6-4e00-8b57-67f7ea261b35"
+        },
+        "5588cee3-28b6-4e00-8b57-67f7ea261b35": {
+          "id": "5588cee3-28b6-4e00-8b57-67f7ea261b35",
+          "name": "Sequence",
+          "category": "composite",
+          "title": "Sequence",
+          "description": "",
+          "properties": {},
+          "display": {
+            "x": 624,
+            "y": -264
+          },
+          "children": [
+            "08a08a9c-2867-4824-805a-d7ad1c2a4425",
+            "9136ce4c-e2f2-41de-89a7-234543ebf7d8",
+            "79eb3e34-df1e-45f4-8f9a-6ad572e693cf"
+          ]
+        },
+        "9f376dff-8225-4718-8895-193b4bb3d613": {
+          "id": "9f376dff-8225-4718-8895-193b4bb3d613",
+          "name": "Priority",
+          "category": "composite",
+          "title": "Priority",
+          "description": "",
+          "properties": {},
+          "display": {
+            "x": 408,
+            "y": 252
+          },
+          "children": [
+            "f8f3b041-7d51-49a3-aeaa-884f1fcf96e9",
+            "f6618c6b-236a-48ee-8c51-0b537d408c3b"
+          ]
+        },
+        "f8f3b041-7d51-49a3-aeaa-884f1fcf96e9": {
+          "id": "f8f3b041-7d51-49a3-aeaa-884f1fcf96e9",
+          "name": "Sequence",
+          "category": "composite",
+          "title": "Sequence",
+          "description": "",
+          "properties": {},
+          "display": {
+            "x": 624,
+            "y": 144
+          },
+          "children": [
+            "45ef4736-d23e-4572-b774-f7376813781c",
+            "8fe84e26-7b19-4e75-82dc-3a9c7de38a88",
+            "44f08768-4f25-448d-b19c-1fb41c326c68"
+          ]
+        },
+        "f6618c6b-236a-48ee-8c51-0b537d408c3b": {
+          "id": "f6618c6b-236a-48ee-8c51-0b537d408c3b",
+          "name": "Sequence",
+          "category": "composite",
+          "title": "Sequence",
+          "description": "",
+          "properties": {},
+          "display": {
+            "x": 624,
+            "y": 360
+          },
+          "children": [
+            "9af19bbe-1c42-4553-9db6-cb4be8901a98",
+            "604d7780-7012-4175-88b1-7b5c110132ea"
+          ]
+        },
+        "5c75bd99-3249-448d-8a09-2127d91a1c12": {
+          "id": "5c75bd99-3249-448d-8a09-2127d91a1c12",
+          "name": "action_become_idle",
+          "category": "action",
+          "title": "变为空闲状态",
+          "description": "action_become_idle\n变为空闲状态\n返回：SUCCESS",
+          "properties": {},
+          "display": {
+            "x": 1032,
+            "y": -36
+          }
+        },
+        "45ef4736-d23e-4572-b774-f7376813781c": {
+          "id": "45ef4736-d23e-4572-b774-f7376813781c",
+          "name": "cond_is_rage_full",
+          "category": "condition",
+          "title": "怒气值已满",
+          "description": "cond_is_rage_full\n判断怒气值是否已满\n已满：SUCCESS\n未满：FAILURE",
+          "properties": {},
+          "display": {
+            "x": 828,
+            "y": 48
+          }
+        },
+        "44f08768-4f25-448d-b19c-1fb41c326c68": {
+          "id": "44f08768-4f25-448d-b19c-1fb41c326c68",
+          "name": "action_cost_rage",
+          "category": "action",
+          "title": "扣除<cost_rage>怒气",
+          "description": "action_cost_rage\n扣除怒气\n根据cost_rage扣除相应怒气，结果大于等于0\n返回：SUCCESS",
+          "properties": {
+            "cost_rage": 100
+          },
+          "display": {
+            "x": 828,
+            "y": 228
+          }
+        },
+        "08a08a9c-2867-4824-805a-d7ad1c2a4425": {
+          "id": "08a08a9c-2867-4824-805a-d7ad1c2a4425",
+          "name": "cond_is_target_died",
+          "category": "condition",
+          "title": "目标死亡",
+          "description": "cond_is_target_died\n判断目标是否死亡\n死亡：SUCCESS\n未死亡：FAILURE",
+          "properties": {},
+          "display": {
+            "x": 828,
+            "y": -384
+          }
+        },
+        "604d7780-7012-4175-88b1-7b5c110132ea": {
+          "id": "604d7780-7012-4175-88b1-7b5c110132ea",
+          "name": "action_add_rage",
+          "category": "action",
+          "title": "增加<add_rage>怒气",
+          "description": "action_add_rage\n增加怒气\n根据add_rage增加相应怒气，结果小于等于100\n返回：SUCCESS",
+          "properties": {
+            "add_rage": 10
+          },
+          "display": {
+            "x": 828,
+            "y": 408
+          }
+        },
+        "d7bf8a85-e2a4-48d0-807b-c8b4ff0eb85e": {
+          "id": "d7bf8a85-e2a4-48d0-807b-c8b4ff0eb85e",
+          "name": "cond_power_lt",
+          "category": "condition",
+          "title": "体力小于<power>",
+          "description": "cond_power_lt\n判断体力是否小于某值\n是：SUCCESS\n否：FAILURE",
+          "properties": {
+            "power": 50
+          },
+          "display": {
+            "x": 1248,
+            "y": -216
+          }
+        },
+        "f80a69a0-3eca-43a7-8a0f-8bf62e459d9e": {
+          "id": "f80a69a0-3eca-43a7-8a0f-8bf62e459d9e",
+          "name": "Sequence",
+          "category": "composite",
+          "title": "Sequence",
+          "description": "",
+          "properties": {},
+          "display": {
+            "x": 1032,
+            "y": -168
+          },
+          "children": [
+            "d7bf8a85-e2a4-48d0-807b-c8b4ff0eb85e",
+            "835e8a59-65c5-4dcf-a9c0-69cb36cb5b82"
+          ]
+        },
+        "835e8a59-65c5-4dcf-a9c0-69cb36cb5b82": {
+          "id": "835e8a59-65c5-4dcf-a9c0-69cb36cb5b82",
+          "name": "action_become_recovering",
+          "category": "action",
+          "title": "变为恢复状态",
+          "description": "action_become_recovering\n变为恢复状态\n返回：SUCCESS",
+          "properties": {},
+          "display": {
+            "x": 1248,
+            "y": -120
+          }
+        },
+        "79eb3e34-df1e-45f4-8f9a-6ad572e693cf": {
+          "id": "79eb3e34-df1e-45f4-8f9a-6ad572e693cf",
+          "name": "Priority",
+          "category": "composite",
+          "title": "Priority",
+          "description": "",
+          "properties": {},
+          "display": {
+            "x": 828,
+            "y": -96
+          },
+          "children": [
+            "f80a69a0-3eca-43a7-8a0f-8bf62e459d9e",
+            "5c75bd99-3249-448d-8a09-2127d91a1c12"
+          ]
+        },
+        "8fe84e26-7b19-4e75-82dc-3a9c7de38a88": {
+          "id": "8fe84e26-7b19-4e75-82dc-3a9c7de38a88",
+          "name": "action_skill_attack",
+          "category": "action",
+          "title": "技能攻击",
+          "description": "action_skill_attack\n技能攻击\nskill_type : 普通攻击，技能攻击\n 随机伤害值 RAND(min_power ,max_power) * RAND(min_rate, max_rate)\n返回：SUCCESS",
+          "properties": {
+            "min_power": 5,
+            "max_power": 10,
+            "min_rate": 3,
+            "max_rate": 4,
+            "skill_type": "爆头"
+          },
+          "display": {
+            "x": 828,
+            "y": 144
+          }
+        },
+        "9af19bbe-1c42-4553-9db6-cb4be8901a98": {
+          "id": "9af19bbe-1c42-4553-9db6-cb4be8901a98",
+          "name": "action_skill_attack",
+          "category": "action",
+          "title": "技能攻击",
+          "description": "action_skill_attack\n技能攻击\nskill_type : 普通攻击，技能攻击\n 随机伤害值 RAND(min_power ,max_power) * RAND(min_rate, max_rate)\n返回：SUCCESS",
+          "properties": {
+            "min_power": 5,
+            "max_power": 10,
+            "min_rate": 1,
+            "max_rate": 2,
+            "skill_type": "平砍"
+          },
+          "display": {
+            "x": 828,
+            "y": 312
+          }
+        },
+        "9136ce4c-e2f2-41de-89a7-234543ebf7d8": {
+          "id": "9136ce4c-e2f2-41de-89a7-234543ebf7d8",
+          "name": "action_del_dead_target",
+          "category": "action",
+          "title": "删除死亡目标",
+          "description": "action_del_dead_target\n删除死亡目标\n删除rival_list中第一个目标\n返回：SUCCESS",
+          "properties": {},
+          "display": {
+            "x": 828,
+            "y": -300
+          }
+        }
+      },
+      "display": {
+        "camera_x": 316,
+        "camera_y": 534.5,
+        "camera_z": 1,
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "version": "0.3.0",
+      "scope": "tree",
+      "id": "a62217c8-655c-4266-9405-4ffcdbb4360d",
+      "title": "巡逻兵恢复逻辑",
+      "description": "",
+      "root": "1af2edc5-7d01-4975-8439-e391d2f7c719",
+      "properties": {},
+      "nodes": {
+        "1af2edc5-7d01-4975-8439-e391d2f7c719": {
+          "id": "1af2edc5-7d01-4975-8439-e391d2f7c719",
+          "name": "Sequence",
+          "category": "composite",
+          "title": "Sequence",
+          "description": "",
+          "properties": {},
+          "display": {
+            "x": 204,
+            "y": 0
+          },
+          "children": [
+            "068d057d-a43d-4936-8d25-b1ee86f77ea6",
+            "0dda2c45-3ff1-4a26-88bb-ee516beaad0d",
+            "a04072a5-31cc-4125-89a0-9187ffa17fe9"
+          ]
+        },
+        "0dda2c45-3ff1-4a26-88bb-ee516beaad0d": {
+          "id": "0dda2c45-3ff1-4a26-88bb-ee516beaad0d",
+          "name": "Inverter",
+          "category": "decorator",
+          "title": "Inverter",
+          "description": "",
+          "properties": {},
+          "display": {
+            "x": 408,
+            "y": 0
+          },
+          "child": "ede1fa6f-2295-409b-8641-2c32970c069f"
+        },
+        "ede1fa6f-2295-409b-8641-2c32970c069f": {
+          "id": "ede1fa6f-2295-409b-8641-2c32970c069f",
+          "name": "Sequence",
+          "category": "composite",
+          "title": "Sequence",
+          "description": "",
+          "properties": {},
+          "display": {
+            "x": 624,
+            "y": 0
+          },
+          "children": [
+            "1c629e69-7006-4146-8c2a-cd525736f1a2",
+            "68c837c4-2e31-45bf-80bf-488c8699c824"
+          ]
+        },
+        "1c629e69-7006-4146-8c2a-cd525736f1a2": {
+          "id": "1c629e69-7006-4146-8c2a-cd525736f1a2",
+          "name": "cond_is_power_full",
+          "category": "condition",
+          "title": "体力已满",
+          "description": "cond_is_power_full\n判断体力是否已满\n已满：SUCCESS\n未满：FAILURE",
+          "properties": {},
+          "display": {
+            "x": 828,
+            "y": -48
+          }
+        },
+        "68c837c4-2e31-45bf-80bf-488c8699c824": {
+          "id": "68c837c4-2e31-45bf-80bf-488c8699c824",
+          "name": "action_become_idle",
+          "category": "action",
+          "title": "变为空闲状态",
+          "description": "action_become_idle\n变为空闲状态\n返回：SUCCESS",
+          "properties": {},
+          "display": {
+            "x": 828,
+            "y": 36
+          }
+        },
+        "068d057d-a43d-4936-8d25-b1ee86f77ea6": {
+          "id": "068d057d-a43d-4936-8d25-b1ee86f77ea6",
+          "name": "action_recover_power",
+          "category": "action",
+          "title": "恢复<max_power> - <min_power>体力",
+          "description": "action_recover_power\n恢复体力\n根据Max - Min之间随机恢复几点体力\n返回：SUCCESS",
+          "properties": {
+            "max_power": 10,
+            "min_power": 5
+          },
+          "display": {
+            "x": 408,
+            "y": -132
+          }
+        },
+        "a04072a5-31cc-4125-89a0-9187ffa17fe9": {
+          "id": "a04072a5-31cc-4125-89a0-9187ffa17fe9",
+          "name": "Runner",
+          "category": "action",
+          "title": "Runner",
+          "description": "",
+          "properties": {},
+          "display": {
+            "x": 408,
+            "y": 132
+          }
+        }
+      },
+      "display": {
+        "camera_x": 359,
+        "camera_y": 491,
+        "camera_z": 1,
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "version": "0.3.0",
+      "scope": "tree",
+      "id": "0cbbfbf6-c591-4373-80e4-6cef94fdb961",
+      "title": "巡逻兵被动AI",
+      "description": "",
+      "root": "e4227377-3bbb-48ca-9d86-80796498c818",
+      "properties": {},
+      "nodes": {
+        "3b209dd0-e890-493b-835e-0fdb3c8d2fd6": {
+          "id": "3b209dd0-e890-493b-835e-0fdb3c8d2fd6",
+          "name": "ac40be47-ca6f-4969-9ee0-881bc7f6f831",
+          "category": "tree",
+          "title": "巡逻兵受击逻辑",
+          "description": "",
+          "properties": {},
+          "display": {
+            "x": 156,
+            "y": 60
+          }
+        },
+        "e4227377-3bbb-48ca-9d86-80796498c818": {
+          "id": "e4227377-3bbb-48ca-9d86-80796498c818",
+          "name": "Sequence",
+          "category": "composite",
+          "title": "Sequence",
+          "description": "",
+          "properties": {},
+          "display": {
+            "x": -48,
+            "y": 0
+          },
+          "children": [
+            "28a16fe8-0397-429a-a1e4-9886e9034468",
+            "3b209dd0-e890-493b-835e-0fdb3c8d2fd6"
+          ]
+        },
+        "28a16fe8-0397-429a-a1e4-9886e9034468": {
+          "id": "28a16fe8-0397-429a-a1e4-9886e9034468",
+          "name": "Priority",
+          "category": "composite",
+          "title": "Priority",
+          "description": "",
+          "properties": {},
+          "display": {
+            "x": 156,
+            "y": -72
+          },
+          "children": [
+            "1c4eb87e-bf0b-466e-b8b5-1e7252f79a8e",
+            "4ef71f58-8159-49eb-8d8d-4adb0c2646a5"
+          ]
+        },
+        "1c4eb87e-bf0b-466e-b8b5-1e7252f79a8e": {
+          "id": "1c4eb87e-bf0b-466e-b8b5-1e7252f79a8e",
+          "name": "cond_is_attacking",
+          "category": "condition",
+          "title": "是攻击状态",
+          "description": "cond_is_attacking\n判断是否处于攻击状态\n是：SUCCESS\n否：FAILURE",
+          "properties": {},
+          "display": {
+            "x": 372,
+            "y": -120
+          }
+        },
+        "4ef71f58-8159-49eb-8d8d-4adb0c2646a5": {
+          "id": "4ef71f58-8159-49eb-8d8d-4adb0c2646a5",
+          "name": "action_become_attacking",
+          "category": "action",
+          "title": "变为攻击状态",
+          "description": "action_become_attacking\n变为攻击状态\n返回：SUCCESS",
+          "properties": {},
+          "display": {
+            "x": 372,
+            "y": -24
+          }
+        }
+      },
+      "display": {
+        "camera_x": 804,
+        "camera_y": 537.5,
+        "camera_z": 1,
+        "x": -252,
+        "y": 0
+      }
+    },
+    {
+      "version": "0.3.0",
+      "scope": "tree",
+      "id": "ac40be47-ca6f-4969-9ee0-881bc7f6f831",
+      "title": "巡逻兵受击逻辑",
+      "description": "",
+      "root": "d4fa320c-bbc3-4258-813c-cfb13f5df1f4",
+      "properties": {},
+      "nodes": {
+        "d4fa320c-bbc3-4258-813c-cfb13f5df1f4": {
+          "id": "d4fa320c-bbc3-4258-813c-cfb13f5df1f4",
+          "name": "Sequence",
+          "category": "composite",
+          "title": "Sequence",
+          "description": "",
+          "properties": {},
+          "display": {
+            "x": 24,
+            "y": 24
+          },
+          "children": [
+            "04bdb774-4d05-497d-894d-9c3e8974a3ad",
+            "daeadd62-d74e-4dfd-8a1c-cd7bb34a4810",
+            "0df0056e-0e92-4136-970d-706194b56556"
+          ]
+        },
+        "daeadd62-d74e-4dfd-8a1c-cd7bb34a4810": {
+          "id": "daeadd62-d74e-4dfd-8a1c-cd7bb34a4810",
+          "name": "action_add_rage",
+          "category": "action",
+          "title": "增加<add_rage>怒气",
+          "description": "action_add_rage\n增加怒气\n根据add_rage增加相应怒气，结果小于等于100\n返回：SUCCESS",
+          "properties": {
+            "add_rage": 5
+          },
+          "display": {
+            "x": 228,
+            "y": -12
+          }
+        },
+        "e0c2363e-bc0c-4b1a-a11f-def279017890": {
+          "id": "e0c2363e-bc0c-4b1a-a11f-def279017890",
+          "name": "cond_is_died",
+          "category": "condition",
+          "title": "已经死亡",
+          "description": "cond_is_died\n判断自己是否死亡\n死亡：SUCCESS\n存活：FAILURE",
+          "properties": {},
+          "display": {
+            "x": 444,
+            "y": 72
+          }
+        },
+        "0df0056e-0e92-4136-970d-706194b56556": {
+          "id": "0df0056e-0e92-4136-970d-706194b56556",
+          "name": "Sequence",
+          "category": "composite",
+          "title": "Sequence",
+          "description": "",
+          "properties": {},
+          "display": {
+            "x": 228,
+            "y": 168
+          },
+          "children": [
+            "e0c2363e-bc0c-4b1a-a11f-def279017890",
+            "9d4a7cc5-176b-47e8-8b89-df51f2737af8",
+            "8da8ccf3-70ff-4fbe-8150-de4a0d6be8d1"
+          ]
+        },
+        "8da8ccf3-70ff-4fbe-8150-de4a0d6be8d1": {
+          "id": "8da8ccf3-70ff-4fbe-8150-de4a0d6be8d1",
+          "name": "action_finish",
+          "category": "action",
+          "title": "游戏<is_win>",
+          "description": "action_finish\n游戏结束，根据is_win属性打印结果\n打印结果，结束行为树运行\n返回：SUCCESS",
+          "properties": {
+            "is_win": "失败"
+          },
+          "display": {
+            "x": 444,
+            "y": 252
+          }
+        },
+        "04bdb774-4d05-497d-894d-9c3e8974a3ad": {
+          "id": "04bdb774-4d05-497d-894d-9c3e8974a3ad",
+          "name": "action_cost_power",
+          "category": "action",
+          "title": "扣除体力",
+          "description": "action_cost_power\n扣除体力\n获取Misc结构中的atk_dmg字段的值\n返回：SUCCESS",
+          "properties": {
+            "max_power": "",
+            "min_power": ""
+          },
+          "display": {
+            "x": 228,
+            "y": -96
+          }
+        },
+        "9d4a7cc5-176b-47e8-8b89-df51f2737af8": {
+          "id": "9d4a7cc5-176b-47e8-8b89-df51f2737af8",
+          "name": "action_died",
+          "category": "action",
+          "title": "自我死亡",
+          "description": "action_died\n自我死亡\n销毁对象数据\n返回：SUCCESS",
+          "properties": {},
+          "display": {
+            "x": 444,
+            "y": 168
+          }
+        }
+      },
+      "display": {
+        "camera_x": 723,
+        "camera_y": 516.5,
+        "camera_z": 1,
+        "x": -180,
+        "y": 24
+      }
+    },
+    {
+      "version": "0.3.0",
+      "scope": "tree",
+      "id": "1bbac5e1-753c-4f30-8fef-6db07a54746a",
+      "title": "丧尸主动AI",
+      "description": "",
+      "root": "eb8e9463-53ff-4f24-b52f-f8a96eb5b850",
+      "properties": {},
+      "nodes": {
+        "9413445a-1417-4b4d-9ad1-d2166629f6e6": {
+          "id": "9413445a-1417-4b4d-9ad1-d2166629f6e6",
+          "name": "cond_is_idle",
+          "category": "condition",
+          "title": "是空闲状态",
+          "description": "cond_is_idle\n判断是否处于空闲状态\n是：SUCCESS\n否：FAILURE",
+          "properties": {},
+          "display": {
+            "x": 276,
+            "y": -228
+          }
+        },
+        "cef0c3dd-76bc-468a-8cb8-04a334577975": {
+          "id": "cef0c3dd-76bc-468a-8cb8-04a334577975",
+          "name": "action_become_patrolling",
+          "category": "action",
+          "title": "变为巡逻状态",
+          "description": "action_become_patrolling\n变为巡逻状态\n返回：SUCCESS",
+          "properties": {},
+          "display": {
+            "x": 480,
+            "y": -132
+          }
+        },
+        "eb8e9463-53ff-4f24-b52f-f8a96eb5b850": {
+          "id": "eb8e9463-53ff-4f24-b52f-f8a96eb5b850",
+          "name": "Priority",
+          "category": "composite",
+          "title": "Priority",
+          "description": "",
+          "properties": {},
+          "display": {
+            "x": -144,
+            "y": 0
+          },
+          "children": [
+            "a595ab10-3b5e-48e6-89cb-6d04b61b8464",
+            "5ace3342-0d7a-40f1-b4ab-e2045bfc9bcf",
+            "a90441be-cfff-45e7-8366-c38dbf37a6da"
+          ]
+        },
+        "a595ab10-3b5e-48e6-89cb-6d04b61b8464": {
+          "id": "a595ab10-3b5e-48e6-89cb-6d04b61b8464",
+          "name": "Sequence",
+          "category": "composite",
+          "title": "Sequence",
+          "description": "",
+          "properties": {},
+          "display": {
+            "x": 60,
+            "y": -180
+          },
+          "children": [
+            "9413445a-1417-4b4d-9ad1-d2166629f6e6",
+            "25bfbded-ea50-40fd-ba5d-a433e4fce2f9"
+          ]
+        },
+        "698392c2-5651-4eee-8c08-aac7a7cad452": {
+          "id": "698392c2-5651-4eee-8c08-aac7a7cad452",
+          "name": "2fcfa9bf-f759-4eb6-9168-8ef89d1c46da",
+          "category": "tree",
+          "title": "丧尸攻击逻辑",
+          "description": "",
+          "properties": {},
+          "display": {
+            "x": 276,
+            "y": 216
+          }
+        },
+        "03082add-ab19-4c27-9926-086ee0bb3262": {
+          "id": "03082add-ab19-4c27-9926-086ee0bb3262",
+          "name": "5cb48d65-0fa7-4b75-82e8-a222a0deffdd",
+          "category": "tree",
+          "title": "丧尸巡逻逻辑",
+          "description": "",
+          "properties": {},
+          "display": {
+            "x": 276,
+            "y": 36
+          }
+        },
+        "e3619b0d-64b0-40f2-8246-a90ca01b23a9": {
+          "id": "e3619b0d-64b0-40f2-8246-a90ca01b23a9",
+          "name": "cond_is_patrolling",
+          "category": "condition",
+          "title": "是巡逻状态",
+          "description": "cond_is_patrolling\n判断是否处于巡逻状态\n是：SUCCESS\n否：FAILURE",
+          "properties": {},
+          "display": {
+            "x": 276,
+            "y": -48
+          }
+        },
+        "5ace3342-0d7a-40f1-b4ab-e2045bfc9bcf": {
+          "id": "5ace3342-0d7a-40f1-b4ab-e2045bfc9bcf",
+          "name": "Sequence",
+          "category": "composite",
+          "title": "Sequence",
+          "description": "",
+          "properties": {},
+          "display": {
+            "x": 60,
+            "y": 0
+          },
+          "children": [
+            "e3619b0d-64b0-40f2-8246-a90ca01b23a9",
+            "03082add-ab19-4c27-9926-086ee0bb3262"
+          ]
+        },
+        "a90441be-cfff-45e7-8366-c38dbf37a6da": {
+          "id": "a90441be-cfff-45e7-8366-c38dbf37a6da",
+          "name": "Sequence",
+          "category": "composite",
+          "title": "Sequence",
+          "description": "",
+          "properties": {},
+          "display": {
+            "x": 60,
+            "y": 168
+          },
+          "children": [
+            "8cbe368e-65ce-4cf2-8563-ca83ffc0f002",
+            "698392c2-5651-4eee-8c08-aac7a7cad452"
+          ]
+        },
+        "8cbe368e-65ce-4cf2-8563-ca83ffc0f002": {
+          "id": "8cbe368e-65ce-4cf2-8563-ca83ffc0f002",
+          "name": "cond_is_attacking",
+          "category": "condition",
+          "title": "是攻击状态",
+          "description": "cond_is_attacking\n判断是否处于攻击状态\n是：SUCCESS\n否：FAILURE",
+          "properties": {},
+          "display": {
+            "x": 276,
+            "y": 132
+          }
+        },
+        "25bfbded-ea50-40fd-ba5d-a433e4fce2f9": {
+          "id": "25bfbded-ea50-40fd-ba5d-a433e4fce2f9",
+          "name": "Inverter",
+          "category": "decorator",
+          "title": "Inverter",
+          "description": "",
+          "properties": {},
+          "display": {
+            "x": 276,
+            "y": -132
+          },
+          "child": "cef0c3dd-76bc-468a-8cb8-04a334577975"
+        }
+      },
+      "display": {
+        "camera_x": 960,
+        "camera_y": 508.5,
+        "camera_z": 1,
+        "x": -348,
+        "y": 0
+      }
+    },
+    {
+      "version": "0.3.0",
+      "scope": "tree",
+      "id": "5cb48d65-0fa7-4b75-82e8-a222a0deffdd",
+      "title": "丧尸巡逻逻辑",
+      "description": "",
+      "root": "0dd7d80e-734c-4832-9b1a-c8b85df4a580",
+      "properties": {},
+      "nodes": {
+        "0dd7d80e-734c-4832-9b1a-c8b85df4a580": {
+          "id": "0dd7d80e-734c-4832-9b1a-c8b85df4a580",
+          "name": "MemSequence",
+          "category": "composite",
+          "title": "MemSequence",
+          "description": "",
+          "properties": {},
+          "display": {
+            "x": -72,
+            "y": 36
+          },
+          "children": [
+            "5de1553f-7936-4349-8960-34d2ab175def",
+            "9d77ee7a-f5c3-4bdf-bc67-24d28cdce98b"
+          ]
+        },
+        "9d77ee7a-f5c3-4bdf-bc67-24d28cdce98b": {
+          "id": "9d77ee7a-f5c3-4bdf-bc67-24d28cdce98b",
+          "name": "Sequence",
+          "category": "composite",
+          "title": "Sequence",
+          "description": "",
+          "properties": {},
+          "display": {
+            "x": 132,
+            "y": 192
+          },
+          "children": [
+            "8320ac47-9d8c-432e-a0f3-3583e4e592e5",
+            "fe54994c-99a0-4086-a827-ffbfb9144653",
+            "4afa6247-b396-4e15-b1e4-2b5ec4659789",
+            "5dc62c15-2709-4cba-90cb-01f8e06e8f6c"
+          ]
+        },
+        "8320ac47-9d8c-432e-a0f3-3583e4e592e5": {
+          "id": "8320ac47-9d8c-432e-a0f3-3583e4e592e5",
+          "name": "Inverter",
+          "category": "decorator",
+          "title": "Inverter",
+          "description": "",
+          "properties": {},
+          "display": {
+            "x": 348,
+            "y": 0
+          },
+          "child": "a7ef4ace-028e-4d8e-9054-082acad9f568"
+        },
+        "fe54994c-99a0-4086-a827-ffbfb9144653": {
+          "id": "fe54994c-99a0-4086-a827-ffbfb9144653",
+          "name": "action_move_grid",
+          "category": "action",
+          "title": "移动一格",
+          "description": "action_move_grid\n移动一格\n返回：SUCCESS",
+          "properties": {},
+          "display": {
+            "x": 348,
+            "y": 132
+          }
+        },
+        "a7ef4ace-028e-4d8e-9054-082acad9f568": {
+          "id": "a7ef4ace-028e-4d8e-9054-082acad9f568",
+          "name": "Sequence",
+          "category": "composite",
+          "title": "Sequence",
+          "description": "",
+          "properties": {},
+          "display": {
+            "x": 552,
+            "y": 0
+          },
+          "children": [
+            "7f5cc5fa-39d2-4939-8a9c-158e75ca927a",
+            "1650138e-bccc-41dc-868f-d48485ac164e"
+          ]
+        },
+        "7f5cc5fa-39d2-4939-8a9c-158e75ca927a": {
+          "id": "7f5cc5fa-39d2-4939-8a9c-158e75ca927a",
+          "name": "cond_is_dest",
+          "category": "condition",
+          "title": "到达终点",
+          "description": "cond_is_dest\n判断是否到达终点\n是：SUCCESS\n否：FAILURE",
+          "properties": {},
+          "display": {
+            "x": 756,
+            "y": -48
+          }
+        },
+        "5dc62c15-2709-4cba-90cb-01f8e06e8f6c": {
+          "id": "5dc62c15-2709-4cba-90cb-01f8e06e8f6c",
+          "name": "Runner",
+          "category": "action",
+          "title": "Runner",
+          "description": "",
+          "properties": {},
+          "display": {
+            "x": 348,
+            "y": 396
+          }
+        },
+        "5de1553f-7936-4349-8960-34d2ab175def": {
+          "id": "5de1553f-7936-4349-8960-34d2ab175def",
+          "name": "action_collect_path",
+          "category": "action",
+          "title": "收集巡逻路径",
+          "description": "action_collect_path\n收集巡逻路径\n返回：SUCCESS",
+          "properties": {},
+          "display": {
+            "x": 132,
+            "y": -132
+          }
+        },
+        "1650138e-bccc-41dc-868f-d48485ac164e": {
+          "id": "1650138e-bccc-41dc-868f-d48485ac164e",
+          "name": "action_become_idle",
+          "category": "action",
+          "title": "变为空闲状态",
+          "description": "action_become_idle\n变为空闲状态\n返回：SUCCESS",
+          "properties": {},
+          "display": {
+            "x": 756,
+            "y": 36
+          }
+        },
+        "5f6c51dc-f579-4855-8fb7-342e93b9c255": {
+          "id": "5f6c51dc-f579-4855-8fb7-342e93b9c255",
+          "name": "action_collect_patrol",
+          "category": "action",
+          "title": "寻找巡逻兵",
+          "description": "action_collect_patrol\n寻找巡逻兵\n找到：SUCCESS\n未找到：FAILURE",
+          "properties": {},
+          "display": {
+            "x": 756,
+            "y": 216
+          }
+        },
+        "78d85af4-83d9-4a46-856b-ae4d5c710941": {
+          "id": "78d85af4-83d9-4a46-856b-ae4d5c710941",
+          "name": "Sequence",
+          "category": "composite",
+          "title": "Sequence",
+          "description": "",
+          "properties": {},
+          "display": {
+            "x": 552,
+            "y": 264
+          },
+          "children": [
+            "5f6c51dc-f579-4855-8fb7-342e93b9c255",
+            "bb283abe-9129-43a5-8fa4-2a9876042b41"
+          ]
+        },
+        "bb283abe-9129-43a5-8fa4-2a9876042b41": {
+          "id": "bb283abe-9129-43a5-8fa4-2a9876042b41",
+          "name": "action_become_attacking",
+          "category": "action",
+          "title": "变为攻击状态",
+          "description": "action_become_attacking\n变为攻击状态\n返回：SUCCESS",
+          "properties": {},
+          "display": {
+            "x": 756,
+            "y": 300
+          }
+        },
+        "4afa6247-b396-4e15-b1e4-2b5ec4659789": {
+          "id": "4afa6247-b396-4e15-b1e4-2b5ec4659789",
+          "name": "Inverter",
+          "category": "decorator",
+          "title": "Inverter",
+          "description": "",
+          "properties": {},
+          "display": {
+            "x": 348,
+            "y": 264
+          },
+          "child": "78d85af4-83d9-4a46-856b-ae4d5c710941"
+        }
+      },
+      "display": {
+        "camera_x": 648,
+        "camera_y": 397.5,
+        "camera_z": 1,
+        "x": -276,
+        "y": 36
+      }
+    },
+    {
+      "version": "0.3.0",
+      "scope": "tree",
+      "id": "2fcfa9bf-f759-4eb6-9168-8ef89d1c46da",
+      "title": "丧尸攻击逻辑",
+      "description": "",
+      "root": "95440e68-5b72-4f57-a643-0b5ad4cf16c3",
+      "properties": {},
+      "nodes": {
+        "95440e68-5b72-4f57-a643-0b5ad4cf16c3": {
+          "id": "95440e68-5b72-4f57-a643-0b5ad4cf16c3",
+          "name": "Sequence",
+          "category": "composite",
+          "title": "Sequence",
+          "description": "",
+          "properties": {},
+          "display": {
+            "x": 204,
+            "y": 0
+          },
+          "children": [
+            "64d0d38a-d813-4350-8864-9f49d4cc2cd1",
+            "795036b5-a153-4872-b42f-a583b09c517e"
+          ]
+        },
+        "64d0d38a-d813-4350-8864-9f49d4cc2cd1": {
+          "id": "64d0d38a-d813-4350-8864-9f49d4cc2cd1",
+          "name": "Inverter",
+          "category": "decorator",
+          "title": "Inverter",
+          "description": "",
+          "properties": {},
+          "display": {
+            "x": 408,
+            "y": -96
+          },
+          "child": "b1dcd56f-2af7-4771-b280-30d0d6215d34"
+        },
+        "b1dcd56f-2af7-4771-b280-30d0d6215d34": {
+          "id": "b1dcd56f-2af7-4771-b280-30d0d6215d34",
+          "name": "Sequence",
+          "category": "composite",
+          "title": "Sequence",
+          "description": "",
+          "properties": {},
+          "display": {
+            "x": 624,
+            "y": -96
+          },
+          "children": [
+            "c0f543a4-ab0c-48d8-8ea4-a714762e9f0e",
+            "9fcaa262-144f-4340-bc30-1469ed6ac7f0",
+            "5bbba631-c4da-452a-9e65-f22d12d98ba2"
+          ]
+        },
+        "5bbba631-c4da-452a-9e65-f22d12d98ba2": {
+          "id": "5bbba631-c4da-452a-9e65-f22d12d98ba2",
+          "name": "action_become_idle",
+          "category": "action",
+          "title": "变为空闲状态",
+          "description": "action_become_idle\n变为空闲状态\n返回：SUCCESS",
+          "properties": {},
+          "display": {
+            "x": 828,
+            "y": 0
+          }
+        },
+        "c0f543a4-ab0c-48d8-8ea4-a714762e9f0e": {
+          "id": "c0f543a4-ab0c-48d8-8ea4-a714762e9f0e",
+          "name": "cond_is_target_died",
+          "category": "condition",
+          "title": "目标死亡",
+          "description": "cond_is_target_died\n判断目标是否死亡\n死亡：SUCCESS\n未死亡：FAILURE",
+          "properties": {},
+          "display": {
+            "x": 828,
+            "y": -180
+          }
+        },
+        "795036b5-a153-4872-b42f-a583b09c517e": {
+          "id": "795036b5-a153-4872-b42f-a583b09c517e",
+          "name": "action_skill_attack",
+          "category": "action",
+          "title": "技能攻击",
+          "description": "action_skill_attack\n技能攻击\nskill_type : 普通攻击，技能攻击\n 随机伤害值 RAND(min_power ,max_power) * RAND(min_rate, max_rate)\n返回：SUCCESS",
+          "properties": {
+            "min_power": 1,
+            "max_power": 10,
+            "min_rate": 1,
+            "max_rate": 3,
+            "skill_type": "撕咬"
+          },
+          "display": {
+            "x": 408,
+            "y": 84
+          }
+        },
+        "9fcaa262-144f-4340-bc30-1469ed6ac7f0": {
+          "id": "9fcaa262-144f-4340-bc30-1469ed6ac7f0",
+          "name": "action_del_dead_target",
+          "category": "action",
+          "title": "删除死亡目标",
+          "description": "action_del_dead_target\n删除死亡目标\n删除rival_list中第一个目标\n返回：SUCCESS",
+          "properties": {},
+          "display": {
+            "x": 828,
+            "y": -96
+          }
+        }
+      },
+      "display": {
+        "camera_x": 446,
+        "camera_y": 521.5,
+        "camera_z": 1,
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "version": "0.3.0",
+      "scope": "tree",
+      "id": "2e441ec0-fdeb-4ab4-8738-f3bba3d7cc93",
+      "title": "丧尸被动AI",
+      "description": "",
+      "root": "35e25c83-58a9-4b80-9876-0d3eb8a0039e",
+      "properties": {},
+      "nodes": {
+        "35e25c83-58a9-4b80-9876-0d3eb8a0039e": {
+          "id": "35e25c83-58a9-4b80-9876-0d3eb8a0039e",
+          "name": "Sequence",
+          "category": "composite",
+          "title": "Sequence",
+          "description": "",
+          "properties": {},
+          "display": {
+            "x": -36,
+            "y": 0
+          },
+          "children": [
+            "1dd4c3f5-3e36-4327-8612-6603529a4fe8",
+            "d0f019f0-b156-4a47-856f-710eabb8c1d5"
+          ]
+        },
+        "a44f21a3-743a-4ea0-8350-5981428ce497": {
+          "id": "a44f21a3-743a-4ea0-8350-5981428ce497",
+          "name": "cond_is_died",
+          "category": "condition",
+          "title": "已经死亡",
+          "description": "cond_is_died\n判断自己是否死亡\n死亡：SUCCESS\n存活：FAILURE",
+          "properties": {},
+          "display": {
+            "x": 384,
+            "y": 12
+          }
+        },
+        "d0f019f0-b156-4a47-856f-710eabb8c1d5": {
+          "id": "d0f019f0-b156-4a47-856f-710eabb8c1d5",
+          "name": "Sequence",
+          "category": "composite",
+          "title": "Sequence",
+          "description": "",
+          "properties": {},
+          "display": {
+            "x": 168,
+            "y": 60
+          },
+          "children": [
+            "a44f21a3-743a-4ea0-8350-5981428ce497",
+            "468dc36b-d1e5-4d77-a8a2-ac5079628799"
+          ]
+        },
+        "1dd4c3f5-3e36-4327-8612-6603529a4fe8": {
+          "id": "1dd4c3f5-3e36-4327-8612-6603529a4fe8",
+          "name": "action_cost_power",
+          "category": "action",
+          "title": "扣除体力",
+          "description": "action_cost_power\n扣除体力\n获取Misc结构中的atk_dmg字段的值\n返回：SUCCESS",
+          "properties": {
+            "max_power": "",
+            "min_power": ""
+          },
+          "display": {
+            "x": 168,
+            "y": -72
+          }
+        },
+        "468dc36b-d1e5-4d77-a8a2-ac5079628799": {
+          "id": "468dc36b-d1e5-4d77-a8a2-ac5079628799",
+          "name": "action_died",
+          "category": "action",
+          "title": "自我死亡",
+          "description": "action_died\n自我死亡\n销毁对象数据\n返回：SUCCESS",
+          "properties": {},
+          "display": {
+            "x": 384,
+            "y": 108
+          }
+        }
+      },
+      "display": {
+        "camera_x": 817,
+        "camera_y": 507.5,
+        "camera_z": 1,
+        "x": -240,
+        "y": 0
+      }
+    }
+  ],
+  "custom_nodes": [
+    {
+      "version": "0.3.0",
+      "scope": "node",
+      "name": "cond_is_patrolling",
+      "category": "condition",
+      "title": "是巡逻状态",
+      "description": "cond_is_patrolling\n判断是否处于巡逻状态\n是：SUCCESS\n否：FAILURE",
+      "properties": {}
+    },
+    {
+      "version": "0.3.0",
+      "scope": "node",
+      "name": "cond_is_dest",
+      "category": "condition",
+      "title": "到达终点",
+      "description": "cond_is_dest\n判断是否到达终点\n是：SUCCESS\n否：FAILURE",
+      "properties": {}
+    },
+    {
+      "version": "0.3.0",
+      "scope": "node",
+      "name": "action_move_grid",
+      "category": "action",
+      "title": "移动一格",
+      "description": "action_move_grid\n移动一格\n返回：SUCCESS",
+      "properties": {}
+    },
+    {
+      "version": "0.3.0",
+      "scope": "node",
+      "name": "action_become_idle",
+      "category": "action",
+      "title": "变为空闲状态",
+      "description": "action_become_idle\n变为空闲状态\n返回：SUCCESS",
+      "properties": {}
+    },
+    {
+      "version": "0.3.0",
+      "scope": "node",
+      "name": "cond_is_attacking",
+      "category": "condition",
+      "title": "是攻击状态",
+      "description": "cond_is_attacking\n判断是否处于攻击状态\n是：SUCCESS\n否：FAILURE",
+      "properties": {}
+    },
+    {
+      "version": "0.3.0",
+      "scope": "node",
+      "name": "cond_is_rage_full",
+      "category": "condition",
+      "title": "怒气值已满",
+      "description": "cond_is_rage_full\n判断怒气值是否已满\n已满：SUCCESS\n未满：FAILURE",
+      "properties": {}
+    },
+    {
+      "version": "0.3.0",
+      "scope": "node",
+      "name": "cond_is_power_full",
+      "category": "condition",
+      "title": "体力已满",
+      "description": "cond_is_power_full\n判断体力是否已满\n已满：SUCCESS\n未满：FAILURE",
+      "properties": {}
+    },
+    {
+      "version": "0.3.0",
+      "scope": "node",
+      "name": "cond_is_died",
+      "category": "condition",
+      "title": "已经死亡",
+      "description": "cond_is_died\n判断自己是否死亡\n死亡：SUCCESS\n存活：FAILURE",
+      "properties": {}
+    },
+    {
+      "version": "0.3.0",
+      "scope": "node",
+      "name": "cond_is_target_died",
+      "category": "condition",
+      "title": "目标死亡",
+      "description": "cond_is_target_died\n判断目标是否死亡\n死亡：SUCCESS\n未死亡：FAILURE",
+      "properties": {}
+    },
+    {
+      "version": "0.3.0",
+      "scope": "node",
+      "name": "cond_is_idle",
+      "category": "condition",
+      "title": "是空闲状态",
+      "description": "cond_is_idle\n判断是否处于空闲状态\n是：SUCCESS\n否：FAILURE",
+      "properties": {}
+    },
+    {
+      "version": "0.3.0",
+      "scope": "node",
+      "name": "action_become_patrolling",
+      "category": "action",
+      "title": "变为巡逻状态",
+      "description": "action_become_patrolling\n变为巡逻状态\n返回：SUCCESS",
+      "properties": {}
+    },
+    {
+      "version": "0.3.0",
+      "scope": "node",
+      "name": "action_finish",
+      "category": "action",
+      "title": "游戏<is_win>",
+      "description": "action_finish\n游戏结束，根据is_win属性打印结果\n打印结果，结束行为树运行\n返回：SUCCESS",
+      "properties": {
+        "is_win": ""
+      }
+    },
+    {
+      "version": "0.3.0",
+      "scope": "node",
+      "name": "action_add_rage",
+      "category": "action",
+      "title": "增加<add_rage>怒气",
+      "description": "action_add_rage\n增加怒气\n根据add_rage增加相应怒气，结果小于等于100\n返回：SUCCESS",
+      "properties": {
+        "add_rage": ""
+      }
+    },
+    {
+      "version": "0.3.0",
+      "scope": "node",
+      "name": "action_recover_power",
+      "category": "action",
+      "title": "恢复<max_power> - <min_power>体力",
+      "description": "action_recover_power\n恢复体力\n根据Max - Min之间随机恢复几点体力\n返回：SUCCESS",
+      "properties": {
+        "max_power": "",
+        "min_power": ""
+      }
+    },
+    {
+      "version": "0.3.0",
+      "scope": "node",
+      "name": "action_cost_rage",
+      "category": "action",
+      "title": "扣除<cost_rage>怒气",
+      "description": "action_cost_rage\n扣除怒气\n根据cost_rage扣除相应怒气，结果大于等于0\n返回：SUCCESS",
+      "properties": {
+        "cost_rage": ""
+      }
+    },
+    {
+      "version": "0.3.0",
+      "scope": "node",
+      "name": "cond_is_recovering",
+      "category": "condition",
+      "title": "是恢复状态",
+      "description": "cond_is_recovering\n判断是否处于恢复状态\n是：SUCCESS\n否：FAILURE",
+      "properties": {}
+    },
+    {
+      "version": "0.3.0",
+      "scope": "node",
+      "name": "action_become_recovering",
+      "category": "action",
+      "title": "变为恢复状态",
+      "description": "action_become_recovering\n变为恢复状态\n返回：SUCCESS",
+      "properties": {}
+    },
+    {
+      "version": "0.3.0",
+      "scope": "node",
+      "name": "cond_power_lt",
+      "category": "condition",
+      "title": "体力小于<power>",
+      "description": "cond_power_lt\n判断体力是否小于某值\n是：SUCCESS\n否：FAILURE",
+      "properties": {
+        "power": 50
+      }
+    },
+    {
+      "version": "0.3.0",
+      "scope": "node",
+      "name": "action_become_attacking",
+      "category": "action",
+      "title": "变为攻击状态",
+      "description": "action_become_attacking\n变为攻击状态\n返回：SUCCESS",
+      "properties": {}
+    },
+    {
+      "version": "0.3.0",
+      "scope": "node",
+      "name": "action_collect_dest_path",
+      "category": "action",
+      "title": "收集终点路径",
+      "description": "action_collect_dest_path\n收集终点路径\n返回：SUCCESS",
+      "properties": {}
+    },
+    {
+      "version": "0.3.0",
+      "scope": "node",
+      "name": "action_collect_path",
+      "category": "action",
+      "title": "收集巡逻路径",
+      "description": "action_collect_path\n收集巡逻路径\n返回：SUCCESS",
+      "properties": {}
+    },
+    {
+      "version": "0.3.0",
+      "scope": "node",
+      "name": "action_collect_patrol",
+      "category": "action",
+      "title": "寻找巡逻兵",
+      "description": "action_collect_patrol\n寻找巡逻兵\n找到：SUCCESS\n未找到：FAILURE",
+      "properties": {}
+    },
+    {
+      "version": "0.3.0",
+      "scope": "node",
+      "name": "action_cost_power",
+      "category": "action",
+      "title": "扣除体力",
+      "description": "action_cost_power\n扣除体力\n获取Misc结构中的atk_dmg字段的值\n返回：SUCCESS",
+      "properties": {
+        "max_power": "",
+        "min_power": ""
+      }
+    },
+    {
+      "version": "0.3.0",
+      "scope": "node",
+      "name": "action_skill_attack",
+      "category": "action",
+      "title": "技能攻击",
+      "description": "action_skill_attack\n技能攻击\nskill_type : 普通攻击，技能攻击\n 随机伤害值 RAND(min_power ,max_power) * RAND(min_rate, max_rate)\n返回：SUCCESS",
+      "properties": {
+        "min_power": 0,
+        "max_power": 0,
+        "min_rate": 0,
+        "max_rate": 0,
+        "skill_type": ""
+      }
+    },
+    {
+      "version": "0.3.0",
+      "scope": "node",
+      "name": "action_del_dead_target",
+      "category": "action",
+      "title": "删除死亡目标",
+      "description": "action_del_dead_target\n删除死亡目标\n删除rival_list中第一个目标\n返回：SUCCESS",
+      "properties": {}
+    },
+    {
+      "version": "0.3.0",
+      "scope": "node",
+      "name": "action_died",
+      "category": "action",
+      "title": "自我死亡",
+      "description": "action_died\n自我死亡\n销毁对象数据\n返回：SUCCESS",
+      "properties": {}
+    }
+  ]
+}
