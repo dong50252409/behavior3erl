@@ -8,7 +8,7 @@ Behavior3的erlang支持库
 
     {deps, [
        ...
-       {behavior3erl, "0.1.0"}
+       {behavior3erl, {git, "https://github.com/dong50252409/behavior3erl.git"}}
     ]}.
 
 编译
@@ -46,7 +46,7 @@ add to **rebar.config**
 
     {deps, [
        ...
-       {behavior3erl, "0.1.0"}
+       {behavior3erl, {git, "https://github.com/dong50252409/behavior3erl.git"}}
     ]}.
 
 Build
