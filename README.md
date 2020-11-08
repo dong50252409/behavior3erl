@@ -35,6 +35,10 @@ Behavior3的erlang支持库
 
 [（六）行为树应用之节点执行](http://note.youdao.com/s/PI3Wic5D)
 
+[（七）行为树应用之设计巡逻兵AI](http://note.youdao.com/s/HTCGTgAm)
+
+[（八）行为树应用之设计丧尸AI](http://note.youdao.com/s/3wKFxcTw)
+
 English
 =====
 

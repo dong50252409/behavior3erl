@@ -1,6 +1,5 @@
 -module(wait).
 
-
 %%--------------------------------------------------------------------
 %% include
 %%--------------------------------------------------------------------
@@ -15,22 +14,23 @@
 %% API functions
 %%--------------------------------------------------------------------
 -spec open(bt_node(), bt_state()) -> bt_state().
-open(#{id := Id}, State) ->
-    blackboard:set(start_time, erlang:system_time(millisecond), Id, State).
+open(#{id := ID}, BTState) ->
+    blackboard:set(start_time, erlang:system_time(millisecond), ID, BTState).
 
 -spec tick(bt_node(), bt_state()) -> {bt_status(), bt_state()}.
-tick(#{id := Id, properties := #{milliseconds := EndTime}} = _BTreeNode, State) ->
-    StartTime = blackboard:get(start_time, Id, State),
+tick(#{id := ID, properties := #{milliseconds := EndTime}} = _BTNode, BTState) ->
+    StartTime = blackboard:get(start_time, ID, BTState),
     case erlang:system_time(millisecond) - StartTime > EndTime of
         true ->
-            {?BT_SUCCESS, State};
+            {?BT_SUCCESS, BTState};
         false ->
-            {?BT_RUNNING, State}
+            {?BT_RUNNING, BTState}
     end.
 
 -spec close(bt_node(), bt_state()) -> bt_state().
-close(#{id := Id} = _BTreeNode, State) ->
-    blackboard:remove(start_time, Id, State).
+close(#{id := ID} = _BTNode, BTState) ->
+    blackboard:remove(start_time, ID, BTState).
+
 %%--------------------------------------------------------------------
 %% Internal functions
 %%--------------------------------------------------------------------

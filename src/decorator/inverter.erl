@@ -1,6 +1,5 @@
 -module(inverter).
 
-
 %%--------------------------------------------------------------------
 %% include
 %%--------------------------------------------------------------------
@@ -15,20 +14,17 @@
 %% API functions
 %%--------------------------------------------------------------------
 -spec tick(bt_node(), bt_state()) -> {bt_status(), bt_state()}.
-tick(#{children := Children} = _BTreeNode, State) ->
-    case Children of
-        [ChildId] ->
-            case behavior_tree:do_execute(ChildId, State) of
-                {?BT_SUCCESS, State1} ->
-                    {?BT_FAILURE, State1};
-                {?BT_FAILURE, State1} ->
-                    {?BT_SUCCESS, State1};
-                {Status, State1} ->
-                    {Status, State1}
-            end;
-        [] ->
-            {?BT_ERROR, State}
-    end.
+tick(#{children := [ChildID]} = _BTNode, BTState) ->
+    case base_node:execute(ChildID, BTState) of
+        {?BT_SUCCESS, BTState1} ->
+            {?BT_FAILURE, BTState1};
+        {?BT_FAILURE, BTState1} ->
+            {?BT_SUCCESS, BTState1};
+        {BTStatus, BTState1} ->
+            {BTStatus, BTState1}
+    end;
+tick(_BTNode, BTState) ->
+    {?BT_ERROR, BTState}.
 
 %%--------------------------------------------------------------------
 %% Internal functions

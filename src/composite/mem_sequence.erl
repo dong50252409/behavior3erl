@@ -1,6 +1,5 @@
 -module(mem_sequence).
 
-
 %%--------------------------------------------------------------------
 %% include
 %%--------------------------------------------------------------------
@@ -15,29 +14,30 @@
 %% API functions
 %%--------------------------------------------------------------------
 -spec open(bt_node(), bt_state()) -> bt_state().
-open(#{id := Id, children := Children} = _BTreeNode, State) ->
-    blackboard:set(running_children, Children, Id, State).
+open(#{id := ID, children := Children} = _BTNode, BTState) ->
+    blackboard:set(running_children, Children, ID, BTState).
 
 -spec tick(bt_node(), bt_state()) -> {bt_status(), bt_state()}.
-tick(#{id := Id} = _BTreeNode, State) ->
-    RunningChildren = blackboard:get(running_children, Id, State),
-    tick_1(RunningChildren, Id, State).
+tick(#{id := ID} = _BTNode, BTState) ->
+    RunningChildren = blackboard:get(running_children, ID, BTState),
+    tick_1(RunningChildren, ID, BTState).
 
 -spec close(bt_node(), bt_state()) -> bt_state().
-close(#{id := Id} = _BTreeNode, State) ->
-    blackboard:remove(running_children, Id, State).
+close(#{id := ID} = _BTNode, BTState) ->
+    blackboard:remove(running_children, ID, BTState).
+
 %%--------------------------------------------------------------------
 %% Internal functions
 %%--------------------------------------------------------------------
-tick_1([ChildId | T] = Children, Id, State) ->
-    case behavior_tree:do_execute(ChildId, State) of
-        {?BT_SUCCESS, State1} ->
-            tick_1(T, Id, State1);
-        {?BT_RUNNING, State1} ->
-            State2 = blackboard:set(running_children, Children, Id, State1),
-            {?BT_RUNNING, State2};
-        {Status, State1} ->
-            {Status, State1}
+tick_1([ChildID | T] = Children, ID, BTState) ->
+    case base_node:execute(ChildID, BTState) of
+        {?BT_SUCCESS, BTState1} ->
+            tick_1(T, ID, BTState1);
+        {?BT_RUNNING, BTState1} ->
+            BTState2 = blackboard:set(running_children, Children, ID, BTState1),
+            {?BT_RUNNING, BTState2};
+        {BTStatus, BTState1} ->
+            {BTStatus, BTState1}
     end;
-tick_1([], _Id, State) ->
-    {?BT_SUCCESS, State}.
+tick_1([], _ID, BTState) ->
+    {?BT_SUCCESS, BTState}.

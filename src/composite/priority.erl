@@ -1,6 +1,5 @@
 -module(priority).
 
-
 %%--------------------------------------------------------------------
 %% include
 %%--------------------------------------------------------------------
@@ -15,18 +14,18 @@
 %% API functions
 %%--------------------------------------------------------------------
 -spec tick(bt_node(), bt_state()) -> {bt_status(), bt_state()}.
-tick(#{children := Children} = _BTreeNode, State) ->
-    tick_1(Children, State).
+tick(#{children := Children} = _BTNode, BTState) ->
+    tick_1(Children, BTState).
 
 %%--------------------------------------------------------------------
 %% Internal functions
 %%--------------------------------------------------------------------
-tick_1([ChildId | T], State) ->
-    case behavior_tree:do_execute(ChildId, State) of
-        {?BT_FAILURE, State1} ->
-            tick_1(T, State1);
-        {Status, State1} ->
-            {Status, State1}
+tick_1([ChildID | T], BTState) ->
+    case base_node:execute(ChildID, BTState) of
+        {?BT_FAILURE, BTState1} ->
+            tick_1(T, BTState1);
+        {BTStatus, BTState1} ->
+            {BTStatus, BTState1}
     end;
-tick_1([], State) ->
-    {?BT_FAILURE, State}.
+tick_1([], BTState) ->
+    {?BT_FAILURE, BTState}.

@@ -1,6 +1,5 @@
 -module(max_time).
 
-
 %%--------------------------------------------------------------------
 %% include
 %%--------------------------------------------------------------------
@@ -15,29 +14,26 @@
 %% API functions
 %%--------------------------------------------------------------------
 -spec open(bt_node(), bt_state()) -> bt_state().
-open(#{id := Id} = _BTreeNode, State) ->
-    blackboard:set(start_time, erlang:system_time(millisecond), Id, State).
+open(#{id := ID} = _BTNode, BTState) ->
+    blackboard:set(start_time, erlang:system_time(millisecond), ID, BTState).
 
 -spec tick(bt_node(), bt_state()) -> {bt_status(), bt_state()}.
-tick(#{id := Id, children := Children, properties := #{max_time := MaxTime}} = _BTreeNode, State) ->
-    case Children of
-        [ChildId] ->
-            StartTime = blackboard:get(start_time, Id, State),
-            {Status, State1} = behavior_tree:do_execute(ChildId, State),
-            case MaxTime > erlang:system_time(millisecond) - StartTime of
-                true ->
-                    {Status, State1};
-                false ->
-                    {?BT_FAILURE, State}
-            end;
-        [] ->
-            {?BT_ERROR, State}
-    end.
+tick(#{id := ID, children := [ChildID] , properties := #{max_time := MaxTime}} = _BTNode, BTState) ->
+    StartTime = blackboard:get(start_time, ID, BTState),
+    {BTStatus, BTState1} = base_node:execute(ChildID, BTState),
+    case MaxTime > erlang:system_time(millisecond) - StartTime of
+        true ->
+            {BTStatus, BTState1};
+        false ->
+            {?BT_FAILURE, BTState}
+    end;
+tick(_BTNode, BTState) ->
+    {?BT_ERROR, BTState}.
 
 -spec close(bt_node(), bt_state()) -> bt_state().
-close(#{id := Id} = _BTreeNode, State) ->
-    blackboard:remove(start_time, Id, State).
+close(#{id := ID} = _BTNode, BTState) ->
+    blackboard:remove(start_time, ID, BTState).
+
 %%--------------------------------------------------------------------
 %% Internal functions
 %%--------------------------------------------------------------------
-
