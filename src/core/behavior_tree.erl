@@ -70,16 +70,18 @@ get_btree_node(BTNodeID, TreeNodeMaps) ->
 
 %% @doc 
 %% 根据给定节点名初始化整颗行为树
--spec init_btree_by_title(string(), #{string() => bt_node_id()}, #{bt_node_id() => btree()}, tree_nodes()) -> {ok, bt_uid()}.
+-spec init_btree_by_title(string(), #{string() => bt_node_id()}, #{bt_node_id() => btree()}, tree_nodes()) -> {ok, bt_uid()}|{error, term()}.
 init_btree_by_title(Title, TitleMaps, TreeMaps, TreeNodeMaps) ->
     BTNodeID = get_btree_id_by_title(Title, TitleMaps),
     init_btree(BTNodeID, TreeMaps, TreeNodeMaps).
 
 %% @doc 
 %% 根据给定节点初始化整颗行为树
--spec init_btree(bt_node_id(), #{bt_node_id() => btree()}, tree_nodes()) -> {ok, bt_uid()}.
+-spec init_btree(bt_node_id(), #{bt_node_id() => btree()}, tree_nodes()) -> {ok, bt_uid()}|{error, term()}.
 init_btree(BTNodeID, TreeMaps, TreeNodeMaps) ->
-    do_init_btree(BTNodeID, TreeMaps, TreeNodeMaps).
+    #{root := Root} = behavior_tree:get_btree(BTNodeID, TreeMaps),
+    #{id := NodeID} = behavior_tree:get_btree_node(Root, TreeNodeMaps),
+    base_node:do_init(undefined, NodeID, TreeMaps, TreeNodeMaps).
 
 %% @doc 
 %% 执行行为树节点
@@ -102,7 +104,7 @@ execute_child(NodeID, BTState) ->
 
 %% @doc 
 %% 强制关闭指定节点下的所有子节点
--spec close_btree_node(bt_uid(), bt_status()) -> bt_status().
+-spec close_btree_node(bt_uid(), bt_state()) -> bt_state().
 close_btree_node(NodeID, BTState) ->
     BTState1 = do_close_btree_node(NodeID, BTState),
     blackboard:erase_btree(BTState1).
@@ -158,13 +160,13 @@ parse_btree_node(none, TreeNodes, TreeNodeMaps) ->
 
 %% 解析子节点属性数据，
 %% key会转为下划线分割小写atom，value保持不变
--spec parse_properties(uninit_bt_node()) -> properties().
+-spec parse_properties(map()) -> properties().
 parse_properties(#{<<"properties">> := Properties} = _Node) ->
     Fun = fun(K, V, Map) -> Map#{name_convert(K) => V} end,
     maps:fold(Fun, #{}, Properties).
 
 %% 解析子节点
--spec parse_children(uninit_bt_node()) -> [bt_node_id()].
+-spec parse_children(map()) -> [bt_node_id()].
 parse_children(#{<<"child">> := Child} = _Node) ->
     [Child];
 parse_children(#{<<"children">> := Children} = _Node) ->
@@ -192,14 +194,6 @@ name_convert_1(<<C/utf8, Other/binary>>) ->
 name_convert_1(<<>>) ->
     <<>>.
 
-%% 执行行为树初始化
--spec do_init_btree(bt_node_id(), #{bt_node_id() => btree()}, tree_nodes()) -> {ok, bt_uid()}.
-do_init_btree(BTNodeID, TreeMaps, TreeNodeMaps) ->
-    #{root := Root} = behavior_tree:get_btree(BTNodeID, TreeMaps),
-    #{id := NodeID} = behavior_tree:get_btree_node(Root, TreeNodeMaps),
-    RootRef = base_node:do_init(undefined, NodeID, TreeMaps, TreeNodeMaps),
-    {ok, RootRef}.
-
 %% 执行关闭行为树节点
 -spec do_close_btree_node(bt_uid(), bt_state()) -> bt_state().
 do_close_btree_node(NodeID, BTState) ->
@@ -211,7 +205,8 @@ do_close_btree_node(NodeID, BTState) ->
 do_unload_btree_node(NodeID) ->
     #{children := Children} = blackboard:get_btree_node(NodeID),
     do_unload_btree_node_1(Children),
-    blackboard:erase_btree_node(NodeID).
+    blackboard:erase_btree_node(NodeID),
+    ok.
 
 do_unload_btree_node_1([NodeID | T]) ->
     do_unload_btree_node(NodeID),
