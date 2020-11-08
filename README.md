@@ -8,20 +8,26 @@ Behavior3的erlang支持库
 
     {deps, [
        ...
-       {behavior3erl, {git, "https://github.com/dong50252409/behavior3erl.git"}}
+       {behavior3erl, "1.0.0"}
     ]}.
 
 编译
 ----
     $ rebar3 compile
-
+    
+使用
+----
+    {TitleMaps, TreeMaps, TreeNodeMaps} = behavior_tree:load_tree_file("example.json"),
+    {ok, RootID} = behavior_tree:init_btree_by_title(<<"example_ai"/utf8>>, TitleMaps, TreeMaps, TreeNodeMaps),
+    {_BTStatus, _BTState1} = behavior_tree:execute(RootID, BTState = #{}).
+    
 更多
 ----
 [behavior3editor](https://github.com/behavior3/behavior3editor)
 
 [behavior3go](https://github.com/magicsea/behavior3go)
 
-#### Behavoir3使用系列文章：
+#### Behavior3使用系列文章：
 
 [（一）行为树应用之行为树简介](http://note.youdao.com/s/77bGugj9)
 
@@ -50,14 +56,20 @@ add to **rebar.config**
 
     {deps, [
        ...
-       {behavior3erl, {git, "https://github.com/dong50252409/behavior3erl.git"}}
+       {behavior3erl, "1.0.0"}
     ]}.
 
 Build
 ----
 
     $ rebar3 compile
-
+   
+Usage
+----
+    {TitleMaps, TreeMaps, TreeNodeMaps} = behavior_tree:load_tree_file("example.json"),
+    {ok, RootID} = behavior_tree:init_btree_by_title(<<"example_ai"/utf8>>, TitleMaps, TreeMaps, TreeNodeMaps),
+    {_BTStatus, _BTState1} = behavior_tree:execute(RootID, BTState = #{}).
+    
 More
 ----
 
