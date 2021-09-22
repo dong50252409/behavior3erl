@@ -66,11 +66,20 @@ do_init(ParentNodeID, BTNodeID, TreeMaps, TreeNodeMaps) ->
                             BTNode1 = BTNode
                     end,
                     ID = make_ref(),
+                    ChildrenIDList = lists:filtermap(
+                        fun (ChildBTNodeID) ->
+                            case do_init(ID, ChildBTNodeID, TreeMaps, TreeNodeMaps) of
+                                {ok, ChildID} ->
+                                    {true, ChildID};
+                                _ ->
+                                    false
+                            end
+                        end, Children),
                     BTNode2 = BTNode1#{
                         id => ID,
                         bt_node_id => BTNodeID,
                         parent_id => ParentNodeID,
-                        children => [do_init(ID, ChildBTNodeID, TreeMaps, TreeNodeMaps) || ChildBTNodeID <- Children]
+                        children => ChildrenIDList 
                     },
                     blackboard:set_btree_node(BTNode2),
                     {ok, ID};
