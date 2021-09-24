@@ -70,7 +70,7 @@ do_init(ParentNodeID, BTNodeID, TreeMaps, TreeNodeMaps) ->
                         id => ID,
                         bt_node_id => BTNodeID,
                         parent_id => ParentNodeID,
-                        children => [begin {ok, ChildId} = do_init(ID, ChildBTNodeID, TreeMaps, TreeNodeMaps), ChildId end || ChildBTNodeID <- Children]
+                        children => [begin {ok, ChildID} = do_init(ID, ChildBTNodeID, TreeMaps, TreeNodeMaps), ChildID end || ChildBTNodeID <- Children]
                     },
                     blackboard:set_btree_node(BTNode2),
                     {ok, ID};
