@@ -52,13 +52,20 @@
     children := [bt_uid()]
 }.
 
--define(BI_MOD_LIST, [
-    error, failer, runner, succeeder, wait,
+-define(SKIP_MOD, [
     mem_priority, mem_sequence, priority, sequence,
-    inverter, limiter, max_time, repeat_until_failure, repeat_until_success, repeater
+    repeat_until_failure, repeat_until_success, repeater
 ]).
 
--define(BT_LOG(Format), io:format("~w:~w:~w [debug] ~p: " ++ Format ++ "~n", tuple_to_list(time()) ++ [?MODULE])).
--define(BT_LOG(Format, Args), io:format("~w:~w:~w [debug] ~p: " ++ Format ++ "~n", tuple_to_list(time()) ++ [?MODULE | Args])).
+-ifdef(BT_DEBUG).
+-define(BT_DEBUG_LOG(Format, Args), io:format(erlang:get(?BT_DEBUG), unicode:characters_to_list(["~w:~w:~w:~w ~w [debug] ~p: ", Format, "~n"]), tuple_to_list(time()) ++ [erlang:system_time(millisecond) rem 1000, self(), ?MODULE | Args])).
+-define(BT_DEBUG_LOG(Format), ?BT_DEBUG_LOG(Format, [])).
+-else.
+-define(BT_DEBUG_LOG(Format, Args), ok).
+-define(BT_DEBUG_LOG(Format), ok).
+-endif.
+
+-define(BT_ERROR_LOG(Format, Args), io:format(unicode:characters_to_list(["~w:~w:~w ~w [error] ~p: ", Format, "~n"]), tuple_to_list(time()) ++ [self(), ?MODULE | Args])).
+-define(BT_ERROR_LOG(Format), ?BT_ERROR(Format, [])).
 
 -endif.

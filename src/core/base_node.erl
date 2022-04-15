@@ -35,16 +35,16 @@
 %% @doc 执行节点
 -spec execute(bt_uid(), bt_state()) -> {bt_status(), bt_state()}.
 execute(NodeID, BTState) ->
-    BTNode = blackboard:get_btree_node(NodeID),
-    BTState1 = do_open(BTNode, BTState),
-    {BTStatus, BTState2} = do_tick(BTNode, BTState1),
-    case BTStatus of
-        ?BT_RUNNING ->
-            {?BT_RUNNING, BTState2};
-        BTStatus ->
-            BTState3 = do_close(BTNode, BTState2),
-            {BTStatus, BTState3}
-    end.
+	BTNode = blackboard:get_btree_node(NodeID),
+	BTState1 = do_open(BTNode, BTState),
+	{BTStatus, BTState2} = do_tick(BTNode, BTState1),
+	case BTStatus of
+		?BT_RUNNING ->
+			{?BT_RUNNING, BTState2};
+		BTStatus ->
+			BTState3 = do_close(BTNode, BTState2),
+			{BTStatus, BTState3}
+	end.
 
 %%--------------------------------------------------------------------
 %% Internal functions
@@ -52,86 +52,162 @@ execute(NodeID, BTState) ->
 %% 初始化行为树
 -spec do_init(bt_uid()|undefined, bt_node_id(), #{bt_node_id() => btree()}, tree_nodes()) -> {ok, bt_uid()}|{error, term()}.
 do_init(ParentNodeID, BTNodeID, TreeMaps, TreeNodeMaps) ->
-    case behavior_tree:get_btree_node(BTNodeID, TreeNodeMaps) of
-        #{name := Name, category := tree} ->
-            #{root := Root} = behavior_tree:get_btree(Name, TreeMaps),
-            do_init(ParentNodeID, Root, TreeMaps, TreeNodeMaps);
-        #{name := Name, children := Children} = BTNode ->
-            case code:ensure_loaded(Name) of
-                {module, Mod} ->
-                    case erlang:function_exported(Mod, init, 1) of
-                        true ->
-                            BTNode1 = Mod:init(BTNode);
-                        false ->
-                            BTNode1 = BTNode
-                    end,
-                    ID = make_ref(),
-                    BTNode2 = BTNode1#{
-                        id => ID,
-                        bt_node_id => BTNodeID,
-                        parent_id => ParentNodeID,
-                        children => [begin {ok, ChildID} = do_init(ID, ChildBTNodeID, TreeMaps, TreeNodeMaps), ChildID end || ChildBTNodeID <- Children]
-                    },
-                    blackboard:set_btree_node(BTNode2),
-                    {ok, ID};
-                _ ->
-                    {error, {btree_node_not_implement, Name}}
-            end
-    end.
+	case behavior_tree:get_btree_node(BTNodeID, TreeNodeMaps) of
+		#{name := Name, category := tree} ->
+			#{root := Root} = behavior_tree:get_btree(Name, TreeMaps),
+			do_init(ParentNodeID, Root, TreeMaps, TreeNodeMaps);
+		#{name := Name, children := Children} = BTNode ->
+			case code:ensure_loaded(Name) of
+				{module, Mod} ->
+					case erlang:function_exported(Mod, init, 1) of
+						true ->
+							BTNode1 = Mod:init(BTNode);
+						false ->
+							BTNode1 = BTNode
+					end,
+					ID = make_ref(),
+					BTNode2 = BTNode1#{
+						id => ID,
+						bt_node_id => BTNodeID,
+						parent_id => ParentNodeID,
+						children => [begin {ok, ChildID} = do_init(ID, ChildBTNodeID, TreeMaps, TreeNodeMaps), ChildID end || ChildBTNodeID <- Children]
+					},
+					blackboard:set_btree_node(BTNode2),
+					{ok, ID};
+				_ ->
+					{error, {btree_node_not_implement, Name}}
+			end
+	end.
 
+-ifndef(BT_DEBUG).
 %% 如果树节点没有开启，并且有open/2函数实现，则执行open函数，
 %% 如果树节点已经开启，则跳过
 -spec do_open(bt_node(), bt_state()) -> bt_state().
 do_open(#{id := ID, parent_id := ParentID, name := Mod} = BTNode, BTState) ->
-    case blackboard:get('$is_open', ID, false, BTState) of
-        true ->
-            BTState;
-        false ->
-            case erlang:function_exported(Mod, open, 2) of
-                true ->
-                    BTState1 = Mod:open(BTNode, BTState);
-                false ->
-                    BTState1 = BTState
-            end,
-            BTState2 = blackboard:set('$is_open', true, ID, BTState1),
-            case is_reference(ParentID) of
-                true ->
-                    Children = blackboard:get('$children', ParentID, [], BTState2),
-                    blackboard:set('$children', [ID | Children], ParentID, BTState2);
-                false ->
-                    BTState2
-            end
-    end.
-
+	case blackboard:get('$is_open', ID, false, BTState) of
+		true ->
+			BTState;
+		false ->
+			case erlang:function_exported(Mod, open, 2) of
+				true ->
+					BTState1 = Mod:open(BTNode, BTState);
+				false ->
+					BTState1 = BTState
+			end,
+			BTState2 = blackboard:set('$is_open', true, ID, BTState1),
+			case is_reference(ParentID) of
+				true ->
+					Children = blackboard:get('$children', ParentID, [], BTState2),
+					blackboard:set('$children', [ID | Children], ParentID, BTState2);
+				false ->
+					BTState2
+			end
+	end.
 
 %% 执行树节点tick函数
 -spec do_tick(bt_node(), bt_state()) -> {bt_status(), bt_state()}.
 do_tick(#{name := Mod} = BTNode, BTState) ->
-    Mod:tick(BTNode, BTState).
+	Mod:tick(BTNode, BTState).
+
 
 %% @doc 如果树节点有close/2函数实现，则执行close函数
 -spec do_close(bt_node(), bt_state()) -> bt_state().
 do_close(#{id := ID, name := Mod} = BTNode, BTState) ->
-    Children = blackboard:get('$children', ID, [], BTState),
-    BTState1 = do_close_1(Children, BTState),
-    case erlang:function_exported(Mod, close, 2) of
-        true ->
-            BTState2 = Mod:close(BTNode, BTState1);
-        false ->
-            BTState2 = BTState1
-    end,
-    BTState3 = blackboard:set('$is_open', false, ID, BTState2),
-    BTState4 = blackboard:set('$children', [], ID, BTState3),
-    blackboard:erase_node_local(ID, BTState4).
+	Children = blackboard:get('$children', ID, [], BTState),
+	BTState1 = do_close_1(Children, BTState),
+	case erlang:function_exported(Mod, close, 2) of
+		true ->
+			BTState2 = Mod:close(BTNode, BTState1);
+		false ->
+			BTState2 = BTState1
+	end,
+	BTState3 = blackboard:set('$is_open', false, ID, BTState2),
+	BTState4 = blackboard:set('$children', [], ID, BTState3),
+	blackboard:erase_node_local(ID, BTState4).
+-else.
+
+-spec do_open(bt_node(), bt_state()) -> bt_state().
+do_open(#{id := ID, parent_id := ParentID, name := Mod} = BTNode, BTState) ->
+	case blackboard:get('$is_open', ID, false, BTState) of
+		true ->
+			BTState;
+		false ->
+			case erlang:function_exported(Mod, open, 2) of
+				true ->
+					BTState1 = Mod:open(BTNode, BTState),
+					case lists:member(Mod, ?SKIP_MOD) of
+						true ->
+							ok;
+						false ->
+							#{'$global_maps' := Global, '$local_maps' := Local} = BTState1,
+							?BT_DEBUG_LOG("do_open name:~w Global:~w Blackboard:~w~nBTState:~w~n", [
+								Mod, Global, maps:get(ID, Local, #{}),
+								maps:without(['$global_maps', '$local_maps'], BTState1)
+							])
+					end;
+				false ->
+					BTState1 = BTState
+			end,
+			BTState2 = blackboard:set('$is_open', true, ID, BTState1),
+			case is_reference(ParentID) of
+				true ->
+					Children = blackboard:get('$children', ParentID, [], BTState2),
+					blackboard:set('$children', [ID | Children], ParentID, BTState2);
+				false ->
+					BTState2
+			end
+	end.
+
+-spec do_tick(bt_node(), bt_state()) -> {bt_status(), bt_state()}.
+do_tick(#{id := ID, name := Mod, children := Children} = BTNode, BTState) ->
+	{UpBTStatus, UpBTState} = Mod:tick(BTNode, BTState),
+	case lists:member(Mod, ?SKIP_MOD) of
+		true ->
+			ok;
+		false ->
+			ChildrenList = [maps:get(name, blackboard:get_btree_node(ChildId)) || ChildId <- Children],
+			#{'$global_maps' := Global, '$local_maps' := Local} = UpBTState,
+			?BT_DEBUG_LOG("do_tick BTNode:~w~nGlobal:~w Blackboard:~w~nReply:~w~n", [
+				[{name, Mod}, {children, ChildrenList}], Global, maps:get(ID, Local, #{}),
+				{UpBTStatus, maps:without(['$global_maps', '$local_maps'], UpBTState)}
+			])
+	end,
+	{UpBTStatus, UpBTState}.
+
+-spec do_close(bt_node(), bt_state()) -> bt_state().
+do_close(#{id := ID, name := Mod} = BTNode, BTState) ->
+	Children = blackboard:get('$children', ID, [], BTState),
+	BTState1 = do_close_1(Children, BTState),
+	case erlang:function_exported(Mod, close, 2) of
+		true ->
+			BTState2 = Mod:close(BTNode, BTState1),
+			case lists:member(Mod,?SKIP_MOD) of
+				true ->
+					ok;
+				false ->
+					#{'$global_maps' := Global, '$local_maps' := Local} = BTState2,
+					?BT_DEBUG_LOG("do_close name:~w Global:~w Blackboard:~w~nBTState:~w~n", [
+						Mod, Global, maps:get(ID, Local, #{}),
+						maps:without(['$global_maps', '$local_maps'], BTState2)
+					])
+			end;
+		false ->
+			BTState2 = BTState1
+	end,
+	BTState3 = blackboard:set('$is_open', false, ID, BTState2),
+	BTState4 = blackboard:set('$children', [], ID, BTState3),
+	blackboard:erase_node_local(ID, BTState4).
+-endif.
+
 
 do_close_1([NodeID | T], BTState) ->
-    BTState1 = do_close_1(T, BTState),
-    case blackboard:get('$is_open', NodeID, false, BTState1) of
-        true ->
-            BTNode = blackboard:get_btree_node(NodeID),
-            do_close(BTNode, BTState1);
-        false ->
-            BTState1
-    end;
+	BTState1 = do_close_1(T, BTState),
+	case blackboard:get('$is_open', NodeID, false, BTState1) of
+		true ->
+			BTNode = blackboard:get_btree_node(NodeID),
+			do_close(BTNode, BTState1);
+		false ->
+			BTState1
+	end;
 do_close_1([], BTState) ->
-    BTState.
+	BTState.

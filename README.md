@@ -21,6 +21,16 @@ Behavior3的erlang支持库
     {ok, RootID} = behavior_tree:init_btree_by_title(<<"example_ai"/utf8>>, TitleMaps, TreeMaps, TreeNodeMaps),
     {_BTStatus, _BTState1} = behavior_tree:execute(RootID, BTState = #{}).
     
+
+调试信息
+----
+    {erl_opts, [
+        {d, 'BT_DEBUG'}
+    ]}.
+
+    ./rebar3 clean -a
+    ./rebar3 compile
+
 更多
 ----
 [behavior3editor](https://github.com/behavior3/behavior3editor)
@@ -70,6 +80,16 @@ Usage
     {ok, RootID} = behavior_tree:init_btree_by_title(<<"example_ai"/utf8>>, TitleMaps, TreeMaps, TreeNodeMaps),
     {_BTStatus, _BTState1} = behavior_tree:execute(RootID, BTState = #{}).
     
+
+debug
+----
+    {erl_opts, [
+        {d, 'BT_DEBUG'}
+    ]}.
+
+    ./rebar3 clean -a
+    ./rebar3 compile
+
 More
 ----
 
