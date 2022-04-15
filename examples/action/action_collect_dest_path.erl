@@ -48,6 +48,8 @@ get_grid_path(CurGrid, EndGrid) ->
 
 get_grid_path(CurGrid, GridPath, XInc, YInc) ->
     case GridPath of
+        [_,CurGrid|T] ->
+            [CurGrid|T];
         [CurGrid | _] ->
             GridPath;
         [{X, Y} | _] ->
