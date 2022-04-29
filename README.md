@@ -8,7 +8,7 @@ Behavior3的erlang支持库
 
     {deps, [
        ...
-       {behavior3erl, "1.0.0"}
+       {behavior3, "1.0.0"}
     ]}.
 
 编译
@@ -17,8 +17,8 @@ Behavior3的erlang支持库
     
 使用
 ----
-    {TitleMaps, TreeMaps, TreeNodeMaps} = behavior_tree:load_tree_file("example.json"),
-    {ok, RootID} = behavior_tree:init_btree_by_title(<<"example_ai"/utf8>>, TitleMaps, TreeMaps, TreeNodeMaps),
+    ok = behavior_tree:load_tree_file("example.json"),
+    {ok, RootID} = behavior_tree:init_btree_by_title(<<"example_ai"/utf8>>),
     {_BTStatus, _BTState1} = behavior_tree:execute(RootID, BTState = #{}).
     
 
@@ -76,8 +76,8 @@ Build
    
 Usage
 ----
-    {TitleMaps, TreeMaps, TreeNodeMaps} = behavior_tree:load_tree_file("example.json"),
-    {ok, RootID} = behavior_tree:init_btree_by_title(<<"example_ai"/utf8>>, TitleMaps, TreeMaps, TreeNodeMaps),
+    ok = behavior_tree:load_tree_file("example.json"),
+    {ok, RootID} = behavior_tree:init_btree_by_title(<<"example_ai"/utf8>>),
     {_BTStatus, _BTState1} = behavior_tree:execute(RootID, BTState = #{}).
     
 

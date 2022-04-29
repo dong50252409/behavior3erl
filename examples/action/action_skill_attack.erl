@@ -18,7 +18,7 @@
 tick(#{properties := Prop} = _BTree, #{uid := UID, rival_list := [RivalUID | _]} = State) ->
     BTreeID = game_dict:get_passivity_btree_id(RivalUID),
     RivalState = get_be_attacker_rival_state(Prop, UID, RivalUID),
-    {_, RivalState1} = behavior_tree:execute_sub_tree(BTreeID, RivalState),
+    {_, RivalState1} = behavior_tree_mgr:execute_sub_tree(BTreeID, RivalState),
     game_dict:put_role_state(RivalUID, RivalState1),
     {?BT_SUCCESS, State}.
 

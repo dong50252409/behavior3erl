@@ -1,10 +1,10 @@
--module(repeat_until_failure).
+-module('RepeatUntilSuccess').
+
 
 %%--------------------------------------------------------------------
 %% include
 %%--------------------------------------------------------------------
 -include("behavior3.hrl").
-
 %%--------------------------------------------------------------------
 %% export API
 %%--------------------------------------------------------------------
@@ -13,32 +13,32 @@
 %%--------------------------------------------------------------------
 %% API functions
 %%--------------------------------------------------------------------
--spec open(bt_node(), bt_state()) -> bt_state().
-open(#{id := ID} = _BTNode, BTState) ->
+-spec open(tree_node(), bt_state()) -> bt_state().
+open(#{id := ID} = _TreeNode, BTState) ->
     blackboard:set(i, 0, ID, BTState).
 
--spec tick(bt_node(), bt_state()) -> {bt_status(), bt_state()}.
-tick(#{id := ID, children := [ChildID], properties := #{max_loop := MaxLoop}} = _BTNode, BTState) ->
+-spec tick(tree_node(), bt_state()) -> {bt_status(), bt_state()}.
+tick(#{id := ID, children := [ChildID], properties := #{max_loop := MaxLoop}} = _TreeNode, BTState) ->
     I = blackboard:get(i, ID, BTState),
     {I1, BTStatus, BTState1} = tick_1(MaxLoop, I, ChildID, ?BT_ERROR, BTState),
     BTState2 = blackboard:set(i, I1, ID, BTState1),
     {BTStatus, BTState2};
-tick(_BTNode, BTState) ->
+tick(_TreeNode, BTState) ->
     {?BT_ERROR, BTState}.
 
--spec close(bt_node(), bt_state()) -> bt_state().
-close(#{id := ID} = _BTNode, BTState) ->
+-spec close(tree_node(), bt_state()) -> bt_state().
+close(#{id := ID} = _TreeNode, BTState) ->
     blackboard:remove(i, ID, BTState).
 
 %%--------------------------------------------------------------------
 %% Internal functions
 %%--------------------------------------------------------------------
 tick_1(MaxLoop, I, ChildID, _BTStatus, BTState) when MaxLoop < 0 orelse I < MaxLoop ->
-    case base_node:execute(ChildID, BTState) of
-        {?BT_SUCCESS, BTState1} ->
-            tick_1(MaxLoop, I + 1, ChildID, ?BT_SUCCESS, BTState1);
-        {BTStatus, BTState1} ->
-            {I, BTStatus, BTState1}
+    case base_node:do_execute(ChildID, BTState) of
+        {?BT_FAILURE, BTBTState1} ->
+            tick_1(MaxLoop, I + 1, ChildID, ?BT_FAILURE, BTBTState1);
+        {BTStatus, BTBTState1} ->
+            {I, BTStatus, BTBTState1}
     end;
 tick_1(_MaxLoop, I, _ChildID, BTStatus, BTState) ->
     {I, BTStatus, BTState}.

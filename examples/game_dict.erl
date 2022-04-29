@@ -34,7 +34,7 @@ update_map_date(OldGrid, NewGrid, UID) ->
     erlang:put(NewGrid, [UID | get_map_data(NewGrid)]),
     ok.
 
--spec get_initiative_btree_id(uid()) -> bt_uid().
+-spec get_initiative_btree_id(uid()) -> node_id().
 get_initiative_btree_id(UID) ->
     erlang:get({initiative_btree_id, UID}).
 put_initiative_btree_id(UID, BTreeID) ->
@@ -42,7 +42,7 @@ put_initiative_btree_id(UID, BTreeID) ->
 erase_initiative_btree_id(UID) ->
     erlang:erase({initiative_btree_id, UID}).
 
--spec get_passivity_btree_id(uid()) -> bt_uid().
+-spec get_passivity_btree_id(uid()) -> node_id().
 get_passivity_btree_id(UID) ->
     erlang:get({passivity_btree_id, UID}).
 put_passivity_btree_id(UID, BTreeID) ->

@@ -8,84 +8,43 @@
 %%--------------------------------------------------------------------
 %% export API
 %%--------------------------------------------------------------------
--export([
-    get_btree_node/1, set_btree_node/1, erase_btree_node/1,
-    set_global/3, set/4,
-    get_global/2, get_global/3, get/3, get/4,
-    remove/2, remove/3
-]).
+-export([set/4, get/3, get/4, remove/3]).
 
-%% Internal API
--export([init_maps_keys/1, erase_node_local/2, erase_btree/1]).
+% Internal API
+-export([ensure_blackboard/1, set_running_info/3, get_tree_mod/1, get_tree_title/1, erase_node/2, erase_tree/1, erase_all_tree/1, get_tree_maps/1, get_log_file/1]).
+
+%%--------------------------------------------------------------------
+%% defined
+%%--------------------------------------------------------------------
+-define(B3_MAPS, '$b3_maps').
+-define(B3_RUNNING_TITLE, '$b3_running_title').
+-define(B3_RUNNING_MOD, '$b3_running_mod').
+-define(B3_LOG_FILE(Title), {'$b3_log_file', Title}).
 
 %%--------------------------------------------------------------------
 %% API functions
 %%--------------------------------------------------------------------
 %% @doc
-%% 获取树节点
--spec get_btree_node(bt_uid()) -> bt_node()|undefined.
-get_btree_node(NodeID) ->
-    get({btree_node, NodeID}).
-
-%% @doc
-%% 设置树节点
--spec set_btree_node(bt_node()) -> ok.
-set_btree_node(#{id := NodeID} = BTNode) ->
-    put({btree_node, NodeID}, BTNode),
-    ok.
-
-%% @doc
-%% 移除树节点
--spec erase_btree_node(bt_uid()) -> bt_node().
-erase_btree_node(NodeID) ->
-    erase({btree_node, NodeID}).
-
-%% @doc
-%% 设置全局变量
--spec set_global(term(), term(), bt_state()) -> bt_state().
-set_global(Key, Value, #{'$global_maps' := GlobalMaps} = BTState) ->
-    BTState#{'$global_maps' := GlobalMaps#{Key => Value}}.
-
-%% @doc
 %% 设置节点变量
--spec set(term(), term(), bt_uid(), bt_state()) -> bt_state().
-set(Key, Value, NodeID, #{'$local_maps' := LocalMaps} = BTState) ->
-    case LocalMaps of
-        #{NodeID := ValueMaps} ->
-            LocalMaps1 = LocalMaps#{NodeID := ValueMaps#{Key => Value}};
+-spec set(Key :: term(), Value :: term(), NodeID :: node_id(), BTState :: bt_state()) -> bt_state().
+set(Key, Value, NodeID, #{?B3_MAPS := B3Maps, ?B3_RUNNING_TITLE := Title} = BTState) ->
+    case B3Maps of
+        #{Title := #{NodeID := #{Key := _} = NodeMaps} = TitleMaps} ->
+            BTState#{?B3_MAPS := B3Maps#{Title := TitleMaps#{NodeID := NodeMaps#{Key := Value}}}};
+        #{Title := #{NodeID := NodeMaps} = TitleMaps} ->
+            BTState#{?B3_MAPS := B3Maps#{Title := TitleMaps#{NodeID := NodeMaps#{Key => Value}}}};
+        #{Title := TitleMaps} ->
+            BTState#{?B3_MAPS := B3Maps#{Title := TitleMaps#{NodeID => #{Key => Value}}}};
         #{} ->
-            LocalMaps1 = LocalMaps#{NodeID => #{Key => Value}}
-    end,
-    BTState#{'$local_maps' := LocalMaps1}.
-
-%% @doc
-%% 获取全局变量
--spec get_global(term(), bt_state()) -> term()|undefined.
-get_global(Key, BTState) ->
-    case BTState of
-        #{'$global_maps' := #{Key := Value}} ->
-            Value;
-        #{} ->
-            undefined
-    end.
-
-%% @doc
-%% 获取全局变量，不存在则返回Default
--spec get_global(term(), term(), bt_state()) -> term().
-get_global(Key, Default, BTState) ->
-    case BTState of
-        #{'$global_maps' := #{Key := Value}} ->
-            Value;
-        #{} ->
-            Default
+            BTState#{?B3_MAPS => B3Maps#{Title => #{NodeID => #{Key => Value}}}}
     end.
 
 %% @doc
 %% 获取节点变量
--spec get(term(), bt_uid(), bt_state()) -> term()|undefined.
-get(Key, NodeID, BTState) ->
-    case BTState of
-        #{'$local_maps' := #{NodeID := #{Key := Value}}} ->
+-spec get(Key :: term(), NodeID :: node_id(), _BTState :: bt_state()) -> Value :: term()|undefined.
+get(Key, NodeID, #{?B3_MAPS := B3Maps, ?B3_RUNNING_TITLE := Title} = _BTState) ->
+    case B3Maps of
+        #{Title := #{NodeID := #{Key := Value}}} ->
             Value;
         #{} ->
             undefined
@@ -93,29 +52,23 @@ get(Key, NodeID, BTState) ->
 
 %% @doc
 %% 获取节点变量，不存在则返回Default
--spec get(term(), bt_uid(), term(), bt_state()) -> term().
+-spec get(Key :: term(), NodeID :: node_id(), Default :: term(), BTState :: bt_state()) ->
+    Value :: term().
 get(Key, NodeID, Default, BTState) ->
-    case BTState of
-        #{'$local_maps' := #{NodeID := #{Key := Value}}} ->
-            Value;
-        #{} ->
-            Default
+    case get(Key, NodeID, BTState) of
+        undefined ->
+            Default;
+        Value ->
+            Value
     end.
 
 %% @doc
-%% 删除全局变量
--spec remove(term(), bt_state()) -> bt_state().
-remove(Key, #{'$global_maps' := GlobalMaps} = BTState) ->
-    BTState#{'$global_maps' := maps:remove(Key, GlobalMaps)}.
-
-%% @doc
 %% 删除节点变量
--spec remove(term(), bt_uid(), bt_state()) -> bt_state().
-remove(Key, NodeID, #{'$local_maps' := LocalMaps} = BTState) ->
-    case LocalMaps of
-        #{NodeID := ValueMap} ->
-            LocalMaps1 = LocalMaps#{NodeID := maps:remove(Key, ValueMap)},
-            BTState#{'$local_maps' := LocalMaps1};
+-spec remove(Key :: term(), NodeID :: node_id(), BTState :: bt_state()) -> bt_state().
+remove(Key, NodeID, #{?B3_MAPS := B3Maps, ?B3_RUNNING_TITLE := Title} = BTState) ->
+    case B3Maps of
+        #{Title := #{NodeID := NodeMaps} = TitleMaps} ->
+            BTState#{?B3_MAPS := B3Maps#{Title := TitleMaps#{NodeID := maps:remove(Key, NodeMaps)}}};
         #{} ->
             BTState
     end.
@@ -123,35 +76,79 @@ remove(Key, NodeID, #{'$local_maps' := LocalMaps} = BTState) ->
 %%--------------------------------------------------------------------
 %% Internal functions
 %%--------------------------------------------------------------------
-%% 初始化行为树相关结构
--spec init_maps_keys(bt_state()) -> bt_state().
-init_maps_keys(BTState) ->
-    BTState1 = init_global(BTState),
-    init_local(BTState1).
-
-init_global(BTState) ->
-    case maps:is_key('$global_maps', BTState) of
-        true ->
+%% @doc
+%% 确保blackboard初始化
+-spec ensure_blackboard(BTState :: bt_state()) -> bt_state().
+ensure_blackboard(BTState) ->
+    case BTState of
+        #{?B3_MAPS := _} ->
             BTState;
-        false ->
-            BTState#{'$global_maps' => #{}}
+        #{} ->
+            BTState#{?B3_MAPS => #{}}
     end.
 
-init_local(BTState) ->
-    case maps:is_key('$local_maps', BTState) of
-        true ->
-            BTState;
-        false ->
-            BTState#{'$local_maps' => #{}}
+%% @doc
+%% 设置行为树运行信息
+-spec set_running_info(TreeMod :: module(), Title :: binary(), BTState :: bt_state()) -> bt_state().
+set_running_info(TreeMod, Title, BTState) ->
+    BTState#{?B3_RUNNING_MOD => TreeMod, ?B3_RUNNING_TITLE => Title}.
+
+%% @doc
+%% 获取当前运行中行为树模块名
+-spec get_tree_mod(BTState :: bt_status()) -> module().
+get_tree_mod(#{?B3_RUNNING_MOD := TreeMod} = _BTState) ->
+    TreeMod.
+
+%% @doc
+%% 获取当前运行中行为树的名称
+-spec get_tree_title(BTState :: bt_state()) -> binary().
+get_tree_title(#{?B3_RUNNING_TITLE := Title} = _BTState) ->
+    Title.
+
+%% @doc
+%% 擦除节点信息
+-spec erase_node(NodeID :: node_id(), BTState :: bt_state()) -> bt_state().
+erase_node(NodeID, #{?B3_MAPS := B3Maps, ?B3_RUNNING_TITLE := Title} = BTState) ->
+    case B3Maps of
+        #{Title := TitleMaps} ->
+            BTState#{?B3_MAPS := B3Maps#{Title := maps:remove(NodeID, TitleMaps)}};
+        #{} ->
+            BTState
     end.
 
-%% 移除节点局部变量结构
--spec erase_node_local(bt_uid(), bt_state()) -> bt_state().
-erase_node_local(NodeID, #{'$local_maps' := LocalMaps} = BTState) ->
-    BTState#{'$local_maps' := maps:remove(NodeID, LocalMaps)}.
+%% @doc
+%% 擦除行为树所有节点信息
+-spec erase_tree(BTState :: bt_state()) -> bt_state().
+erase_tree(#{?B3_MAPS := B3Maps, ?B3_RUNNING_TITLE := Title} = BTState) ->
+    BTState#{?B3_MAPS := maps:remove(Title, B3Maps)}.
 
-%% 移除行为树相关结构
--spec erase_btree(bt_state()) -> bt_state().
-erase_btree(BTState) ->
-    BTState1 = maps:remove('$global_maps', BTState),
-    maps:remove('$local_maps', BTState1).
+%% @doc
+%% 擦除所有行为树所有节点信息
+erase_all_tree(BTState) ->
+    maps:remove(?B3_MAPS, BTState).
+
+%% @doc
+%% 获取行为树所有节点信息
+get_tree_maps(#{?B3_MAPS := B3Maps, ?B3_RUNNING_TITLE := Title} = _BTState) ->
+    case B3Maps of
+        #{Title := TitleMaps} ->
+            TitleMaps;
+        #{} ->
+            #{}
+    end.
+
+%% @doc
+%% 获取调试文件pid
+get_log_file(#{?B3_MAPS := B3Maps, ?B3_RUNNING_TITLE := Title} = BTState) ->
+    case B3Maps of
+        #{?B3_LOG_FILE(Title) := IO} ->
+            {IO, BTState};
+        #{} ->
+            UpBtState = BTState#{?B3_MAPS := B3Maps#{?B3_LOG_FILE(Title) => create_log_file(Title)}},
+            get_log_file(UpBtState)
+    end.
+
+create_log_file(Title) ->
+    Filename = erlang:iolist_to_binary([Title, "_", lists:droplast(erlang:tl(erlang:pid_to_list(self()))), "_bt.log"]),
+    {ok, IO} = file:open(Filename, [append, {encoding, utf8}]),
+    IO.

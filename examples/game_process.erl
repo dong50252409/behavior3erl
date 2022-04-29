@@ -24,7 +24,7 @@ start_link() ->
     gen_server:start_link(?MODULE, [], []).
 
 init([]) ->
-    {TitleMaps, TreeMaps, TreeNodeMaps} = behavior_tree:load_tree_file("examples/example.json"),
+    {TitleMaps, TreeMaps, TreeNodeMaps} = behavior_tree_mgr:load_tree_file("examples/example.json"),
 
     ZombieList = [
 %%        <<"HUNTER"/utf8>>,
@@ -97,8 +97,8 @@ new_state(UID, Type, CurGrid) ->
     State.
 
 init_zombie([UID | T], TitleMaps, TreeMaps, TreeNodeMaps) ->
-    {ok, InitiativeBTreeID} = behavior_tree:init_btree_by_title(<<"丧尸主动AI"/utf8>>, TitleMaps, TreeMaps, TreeNodeMaps),
-    {ok, PassivityBTreeID} = behavior_tree:init_btree_by_title(<<"丧尸被动AI"/utf8>>, TitleMaps, TreeMaps, TreeNodeMaps),
+    {ok, InitiativeBTreeID} = behavior_tree_mgr:init_btree_by_title(<<"丧尸主动AI"/utf8>>, TitleMaps, TreeMaps, TreeNodeMaps),
+    {ok, PassivityBTreeID} = behavior_tree_mgr:init_btree_by_title(<<"丧尸被动AI"/utf8>>, TitleMaps, TreeMaps, TreeNodeMaps),
     game_dict:put_initiative_btree_id(UID, InitiativeBTreeID),
     game_dict:put_passivity_btree_id(UID, PassivityBTreeID),
     Grid = {?RAND(0, ?MAX_X), ?RAND(0, ?MAX_Y)},
@@ -108,8 +108,8 @@ init_zombie([], _TitleMaps, _TreeMaps, _TreeNodeMaps) ->
     ok.
 
 init_patrol(UID, TitleMaps, TreeMaps, TreeNodeMaps) ->
-    {ok, InitiativeBTreeID} = behavior_tree:init_btree_by_title(<<"巡逻兵主动AI"/utf8>>, TitleMaps, TreeMaps, TreeNodeMaps),
-    {ok, PassivityBTreeID} = behavior_tree:init_btree_by_title(<<"巡逻兵被动AI"/utf8>>, TitleMaps, TreeMaps, TreeNodeMaps),
+    {ok, InitiativeBTreeID} = behavior_tree_mgr:init_btree_by_title(<<"巡逻兵主动AI"/utf8>>, TitleMaps, TreeMaps, TreeNodeMaps),
+    {ok, PassivityBTreeID} = behavior_tree_mgr:init_btree_by_title(<<"巡逻兵被动AI"/utf8>>, TitleMaps, TreeMaps, TreeNodeMaps),
     game_dict:put_initiative_btree_id(UID, InitiativeBTreeID),
     game_dict:put_passivity_btree_id(UID, PassivityBTreeID),
     Grid = {?RAND(0, ?MAX_X), ?RAND(0, ?MAX_Y)},
@@ -122,6 +122,6 @@ run(UID) ->
         true ->
             ok;
         false ->
-            {_, State1} = behavior_tree:execute(BTreeID, State),
+            {_, State1} = behavior_tree_mgr:execute(BTreeID, State),
             game_dict:put_role_state(UID, State1)
     end.

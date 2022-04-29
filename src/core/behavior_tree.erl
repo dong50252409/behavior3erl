@@ -1,7 +1,6 @@
 -module(behavior_tree).
 
--compile([inline, {inline_size, 100}]).
-
+-behavior(gen_server).
 %%--------------------------------------------------------------------
 %% include
 %%--------------------------------------------------------------------
@@ -10,218 +9,210 @@
 %%--------------------------------------------------------------------
 %% export API
 %%--------------------------------------------------------------------
--export([
-	load_tree_file/1,
-	init_btree_by_title/4, init_btree/3,
-	execute/2, execute_child/2, close_btree_node/2, unload_btree/1
-]).
+-export([load_tree_file/1, execute/2, execute_child/2]).
+
+-export([start_link/0]).
 
 %% Internal API
--export([get_btree_id_by_title/2, get_btree/2, get_btree_node/2]).
+-export([init/1, handle_call/3, handle_cast/2]).
+
+-record(state, {unique = 0, tree_mods = #{}, loaded_tree_mods = #{}}).
 
 %%--------------------------------------------------------------------
 %% API functions
 %%--------------------------------------------------------------------
+
+start_link() ->
+    gen_server:start_link({local, ?MODULE}, ?MODULE, [], []).
+
 %% @doc 
 %% 载入行为树文件
--spec load_tree_file(file:name_all()) -> {#{string() => bt_node_id()}, #{bt_node_id() => btree()}, tree_nodes()}|{error, term()}.
-load_tree_file(JsonConfig) ->
-	case file:read_file(JsonConfig) of
-		{ok, Json} ->
-			JsonTerm = jsx:decode(Json, [return_maps]),
-			parse_btree(JsonTerm);
-		{error, Reason} ->
-			?BT_ERROR_LOG("Error:~w Reason:~w JsonConfig:~w", [error, Reason, JsonConfig]),
-			{error, Reason}
-	end.
-
-%% @doc 
-%% 获取行为树根节点id
--spec get_btree_id_by_title(string(), #{string() => bt_node_id()}) -> bt_node_id()|undefined.
-get_btree_id_by_title(Title, TitleMaps) ->
-	case TitleMaps of
-		#{Title := ID} ->
-			ID;
-		#{} ->
-			undefined
-	end.
-
-%% @doc 
-%% 获取行为树根节点
--spec get_btree(bt_node_id(), #{bt_node_id() => btree()}) -> btree()|undefined.
-get_btree(BTNodeID, TreeMaps) ->
-	case TreeMaps of
-		#{BTNodeID := BTree} ->
-			BTree;
-		#{} ->
-			undefined
-	end.
-
-%% @doc 
-%% 获取行为树子节点
--spec get_btree_node(bt_node_id(), tree_nodes()) -> uninit_bt_node()|undefined.
-get_btree_node(BTNodeID, TreeNodeMaps) ->
-	case TreeNodeMaps of
-		#{BTNodeID := BTNode} ->
-			BTNode;
-		#{} ->
-			undefined
-	end.
-
-%% @doc 
-%% 根据给定节点名初始化整颗行为树
--spec init_btree_by_title(string(), #{string() => bt_node_id()}, #{bt_node_id() => btree()}, tree_nodes()) -> {ok, bt_uid()}|{error, term()}.
-init_btree_by_title(Title, TitleMaps, TreeMaps, TreeNodeMaps) ->
-	BTNodeID = get_btree_id_by_title(Title, TitleMaps),
-	init_btree(BTNodeID, TreeMaps, TreeNodeMaps).
-
-%% @doc 
-%% 根据给定节点初始化整颗行为树
--spec init_btree(bt_node_id(), #{bt_node_id() => btree()}, tree_nodes()) -> {ok, bt_uid()}|{error, term()}.
-init_btree(BTNodeID, TreeMaps, TreeNodeMaps) ->
-	do_create_log_file(),
-	#{root := Root} = behavior_tree:get_btree(BTNodeID, TreeMaps),
-	#{id := NodeID} = behavior_tree:get_btree_node(Root, TreeNodeMaps),
-	base_node:do_init(undefined, NodeID, TreeMaps, TreeNodeMaps).
+-spec load_tree_file(JSONConfig :: file:name_all()) -> {ok|reload, TreeMod :: module()}|{error, Reason :: term()}.
+load_tree_file(JSONConfig) ->
+    gen_server:call(?MODULE, {load_tree_file, JSONConfig}, infinity).
 
 %% @doc 
 %% 执行行为树节点
--spec execute(bt_uid(), bt_state()) -> {bt_status(), bt_state()}.
-execute(NodeID, BTState) ->
-	BTState1 = blackboard:init_maps_keys(BTState),
-	case base_node:execute(NodeID, BTState1) of
-		{?BT_RUNNING, BTState2} ->
-			{?BT_RUNNING, BTState2};
-		{BTStatus, BTState2} ->
-			BTState3 = blackboard:erase_btree(BTState2),
-			{BTStatus, BTState3}
-	end.
+%% TODO 通过Title获取Mod并执行，热更新问题
+-spec execute(Title :: string(), BTState :: bt_state()) -> {bt_status(), bt_state()}|{error, tree_not_found}.
+execute(Title, BTState) when is_list(Title) ->
+    execute(unicode:characters_to_binary(Title), BTState);
+execute(Title, BTState) when is_binary(Title) ->
+    case gen_server:call(?MODULE, {get_tree_mod, Title}) of
+        {ok, TreeMod} ->
+            case base_node:execute(TreeMod, Title, BTState) of
+                {?BT_RUNNING, BTState2} ->
+                    {?BT_RUNNING, BTState2};
+                {BTStatus, BTState2} ->
+                    BTState3 = blackboard:erase_tree(BTState2),
+                    {BTStatus, BTState3}
+            end;
+        Err ->
+            Err
+    end.
 
 %% @doc 
 %% 动态执行子节点
--spec execute_child(bt_uid(), bt_state()) -> {bt_status(), bt_state()}.
+-spec execute_child(NodeID :: node_id(), BTState :: bt_state()) -> {bt_status(), bt_state()}.
 execute_child(NodeID, BTState) ->
-	base_node:execute(NodeID, BTState).
+    base_node:do_execute(NodeID, BTState).
 
-%% @doc 
-%% 强制关闭指定节点下的所有子节点
--spec close_btree_node(bt_uid(), bt_state()) -> bt_state().
-close_btree_node(NodeID, BTState) ->
-	BTState1 = do_close_btree_node(NodeID, BTState),
-	blackboard:erase_btree(BTState1).
+init(_Args) ->
+    {ok, #state{}}.
 
-%% @doc 
-%% 卸载指定节点下的所有子节点
--spec unload_btree(bt_uid()) -> ok.
-unload_btree(NodeID) ->
-	do_unload_btree_node(NodeID).
+handle_call({load_tree_file, JSONConfig}, _From, State) ->
+    {Reply, UpState} = do_load_tree_file(JSONConfig, State),
+    {reply, Reply, UpState};
+
+handle_call({get_tree_mod, Title}, _From, #state{tree_mods = TreeMods} = State) ->
+    case TreeMods of
+        #{Title := TreeMod} ->
+            {reply, {ok, TreeMod}, State};
+        #{} ->
+            {reply, {error, tree_not_found}, State}
+    end.
+
+
+handle_cast(_Request, State) ->
+    {noreply, State}.
 
 %%--------------------------------------------------------------------
 %% Internal functions
 %%--------------------------------------------------------------------
--ifndef(BT_DEBUG).
-do_create_log_file() ->
-	ok.
--else.
-do_create_log_file() ->
-	Filename = [lists:delete($>, lists:delete($<, erlang:pid_to_list(self()))), "_bt.log"],
-	{ok, IO} = file:open(Filename, [write, {encoding, utf8}]),
-	erlang:put(?BT_DEBUG, IO),
-	ok.
--endif.
+to_list(Term) when erlang:is_list(Term) ->
+    Term;
+to_list(Term) when erlang:is_binary(Term) ->
+    erlang:binary_to_list(Term);
+to_list(Term) when erlang:is_integer(Term) ->
+    erlang:integer_to_list(Term).
+
+str_to_atom(Str) when erlang:is_list(Str) ->
+    erlang:list_to_atom(Str);
+str_to_atom(Str) when erlang:is_binary(Str) ->
+    erlang:binary_to_atom(Str, utf8).
+
+gen_tree_mod(JSONConfig, #state{unique = Unique, loaded_tree_mods = LoadedTreeMods} = State) ->
+    RootName = to_list(filename:rootname(filename:basename(JSONConfig))),
+    UpUnique = Unique + 1,
+    StrTreeMod = RootName ++ to_list(UpUnique),
+    TreeMod = str_to_atom(StrTreeMod),
+    case LoadedTreeMods of
+        #{RootName := L} ->
+            {TreeMod, State#state{unique = UpUnique, loaded_tree_mods = LoadedTreeMods#{RootName := [TreeMod | L]}}};
+        #{} ->
+            {TreeMod, State#state{unique = UpUnique, loaded_tree_mods = LoadedTreeMods#{RootName => [TreeMod]}}}
+    end.
+
+
+do_load_tree_file(JSONConfig, State) ->
+    {TreeMod, UpState} = gen_tree_mod(JSONConfig, State),
+    case file:read_file(JSONConfig) of
+        {ok, Content} ->
+            JSONTerm = jsx:decode(Content, [return_maps]),
+            {UpUnique, Titles} = parse_trees(TreeMod, JSONTerm, UpState#state.unique),
+            erlang:garbage_collect(self(), [{async, load_tree_file_gc_finished}]),
+            FinalState = UpState#state{
+                unique = UpUnique,
+                tree_mods = maps:merge(UpState#state.tree_mods, maps:from_list([{Title, TreeMod} || Title <- Titles]))
+            },
+            {{ok, TreeMod}, FinalState};
+        {error, Reason} ->
+            ?BT_ERROR_LOG("Error:~w Reason:~w JsonConfig:~ts", [error, Reason, JSONConfig]),
+            {{error, Reason}, State}
+    end.
+
+merge_trees([#{<<"id">> := ID, <<"root">> := Root, <<"nodes">> := Nodes} | T]) ->
+    M = maps:merge(Nodes, merge_trees(T)),
+    M#{ID => Root};
+merge_trees([]) ->
+    #{}.
 
 %% 解析行为树
--spec parse_btree(map()) -> {#{string() => bt_node_id()}, #{bt_node_id() => btree()}, tree_nodes()}.
-parse_btree(#{<<"trees">> := Trees}) ->
-	parse_btree_1(Trees, #{}, #{}, #{}).
+parse_trees(TreeMod, #{<<"trees">> := Trees}, UniqueID) ->
+    Nodes = merge_trees(Trees),
+    {UpUniqueID, TreeNodes, Titles} = parse_trees_1(Trees, UniqueID, Nodes, #{}, []),
+    load_beam_code(TreeMod, TreeNodes, Titles),
+    {UpUniqueID, Titles}.
 
-parse_btree_1([Node | T], TitleMaps, TreeMaps, TreeNodeMaps) ->
-	#{<<"id">> := ID, <<"title">> := Title, <<"root">> := Root, <<"nodes">> := Nodes} = Node,
-	Iterator = maps:iterator(Nodes),
-	{TreeNodes, TreeNodeMaps1} = parse_btree_node(maps:next(Iterator), #{}, TreeNodeMaps),
-	BTree = #{
-		id => ID,
-		root => Root,
-		properties => parse_properties(Node),
-		tree_nodes => TreeNodes
-	},
-	parse_btree_1(T, TitleMaps#{Title => ID}, TreeMaps#{ID => BTree}, TreeNodeMaps1);
-parse_btree_1([], TitleMaps, TreeMaps, TreeNodeMaps) ->
-	{TitleMaps, TreeMaps, TreeNodeMaps}.
+parse_trees_1([#{<<"title">> := Title, <<"root">> := Root} | T], UniqueID, Nodes, TreeNodes, Titles) ->
+    case TreeNodes of
+        #{Root := #tree_node{id = ID}} ->
+            parse_trees_1(T, UniqueID, Nodes, TreeNodes, [{Title, ID} | Titles]);
+        #{} ->
+            {UpUniqueID, UpTreeNodes} = parse_node(Root, UniqueID, Nodes, TreeNodes),
+            parse_trees_1(T, UpUniqueID, Nodes, UpTreeNodes, [{Title, (maps:get(Root, UpTreeNodes))#tree_node.id} | Titles])
+    end;
+parse_trees_1([], UniqueID, _Nodes, TreeNodes, Titles) ->
+    {UniqueID, lists:sort([TreeNode || #tree_node{} = TreeNode <- maps:values(TreeNodes)]), Titles}.
 
 %% 解析树节点
--spec parse_btree_node({bt_node_id(), map(), maps:iterator()}|none, tree_nodes(), tree_nodes()) -> {tree_nodes(), tree_nodes()}.
-parse_btree_node({ID, Node, NextIterator}, TreeNodes, TreeNodeMaps) ->
-	#{<<"name">> := Name, <<"category">> := Category} = Node,
-	case Category of
-		<<"tree">> ->
-			Name1 = Name;
-		_ ->
-			Name1 = name_convert(Name)
-	end,
-	TreeNode = #{
-		id => ID,
-		name => Name1,
-		category => binary_to_atom(Category, utf8),
-		properties => parse_properties(Node),
-		children => parse_children(Node)
-	},
-	parse_btree_node(maps:next(NextIterator), TreeNodes#{ID => TreeNode}, TreeNodeMaps#{ID => TreeNode});
-parse_btree_node(none, TreeNodes, TreeNodeMaps) ->
-	{TreeNodes, TreeNodeMaps}.
-
-%% 解析子节点属性数据，
-%% key会转为下划线分割小写atom，value保持不变
--spec parse_properties(map()) -> properties().
-parse_properties(#{<<"properties">> := Properties} = _Node) ->
-	Fun = fun(K, V, Map) -> Map#{name_convert(K) => V} end,
-	maps:fold(Fun, #{}, Properties).
+parse_node(ID, UniqueID, Nodes, TreeNodes) ->
+    case Nodes of
+        #{ID := #{<<"name">> := ChildID, <<"category">> := <<"tree">>}} ->
+            ChildRootID = maps:get(ChildID, Nodes),
+            parse_node(ChildRootID, UniqueID, Nodes, TreeNodes#{ID => ChildRootID});
+        #{ID := #{<<"name">> := Name, <<"properties">> := Properties} = Node} ->
+            NewID = UniqueID + 1,
+            Children = maps:get(<<"children">>, Node, []),
+            {UpUniqueID, UpTreeNodes} = parse_children(Children, NewID, Nodes, TreeNodes),
+            TreeNode = #tree_node{
+                id = NewID,
+                name = str_to_atom(Name),
+                properties = parse_properties(Properties),
+                children = get_children_ids(Children, UpTreeNodes)
+            },
+            false = maps:is_key(ID, UpTreeNodes),
+            {UpUniqueID, UpTreeNodes#{ID => TreeNode}}
+    end.
 
 %% 解析子节点
--spec parse_children(map()) -> [bt_node_id()].
-parse_children(#{<<"child">> := Child} = _Node) ->
-	[Child];
-parse_children(#{<<"children">> := Children} = _Node) ->
-	Children;
-parse_children(_Node) ->
-	[].
+parse_children([ID | T], UniqueID, Nodes, TreeNodes) ->
+    {UpUniqueID, UpTreeNodes} = parse_node(ID, UniqueID, Nodes, TreeNodes),
+    parse_children(T, UpUniqueID, Nodes, UpTreeNodes);
+parse_children([], UniqueID, _Nodes, TreeNodes) ->
+    {UniqueID, TreeNodes}.
 
-%% 模块名转换
-%% 例：PlayerID -> player_id  Name -> name
--spec name_convert(unicode:chardata()) -> atom().
-name_convert(Name) ->
-	case name_convert_1(Name) of
-		<<"_"/utf8, NewName/binary>> ->
-			binary_to_atom(NewName, utf8);
-		NewName ->
-			binary_to_atom(NewName, utf8)
-	end.
+%% 获取子节点id列表
+get_children_ids([ID | T], Nodes) ->
+    case Nodes of
+        #{ID := #tree_node{id = TreeNodeID}} ->
+            [TreeNodeID | get_children_ids(T, Nodes)];
+        #{ID := ChildRootID} ->
+            get_children_ids([ChildRootID], Nodes)
+    end;
+get_children_ids([], _Nodes) ->
+    [].
 
-name_convert_1(<<C/utf8, Other/binary>>) when $A =< C, C =< $Z ->
-	Other1 = name_convert_1(Other),
-	<<"_"/utf8, (C + 32)/utf8, Other1/binary>>;
-name_convert_1(<<C/utf8, Other/binary>>) ->
-	Other1 = name_convert_1(Other),
-	<<C/utf8, Other1/binary>>;
-name_convert_1(<<>>) ->
-	<<>>.
+%% 解析子节点属性数据
+parse_properties(Properties) ->
+    Fun = fun(K, V, Map) -> Map#{str_to_atom(K) => V} end,
+    maps:fold(Fun, #{}, Properties).
 
-%% 执行关闭行为树节点
--spec do_close_btree_node(bt_uid(), bt_state()) -> bt_state().
-do_close_btree_node(NodeID, BTState) ->
-	BTNode = blackboard:get_btree_node(NodeID),
-	base_node:do_close(BTNode, BTState).
+%% 动态编译
+load_beam_code(TreeMod, TreeNodes, Titles) ->
+    Head = io_lib:format("-module(~w).\n\n-export([get_tree_by_title/1, get_node/1]).\n\n", [TreeMod]),
 
-%% 执行卸载行为树节点
--spec do_unload_btree_node(bt_uid()) -> ok.
-do_unload_btree_node(NodeID) ->
-	#{children := Children} = blackboard:get_btree_node(NodeID),
-	do_unload_btree_node_1(Children),
-	blackboard:erase_btree_node(NodeID),
-	ok.
+    Body1 = [
+        [io_lib:format("get_tree_by_title(~w) -> ~w;\n", [Title, ID]) || {Title, ID} <- Titles],
+        "get_tree_by_title(_) -> erlang:throw(tree_not_exist).\n\n"
+    ],
 
-do_unload_btree_node_1([NodeID | T]) ->
-	do_unload_btree_node(NodeID),
-	do_unload_btree_node_1(T);
-do_unload_btree_node_1([]) ->
-	ok.
+    Body2 = [
+        [io_lib:format("get_node(~w) -> ~w;\n", [ID, TreeNode]) || #tree_node{id = ID} = TreeNode <- TreeNodes],
+        "get_node(_) -> erlang:throw(node_not_exist).\n\n"
+    ],
+
+    Text = unicode:characters_to_list([Head, Body1, Body2]),
+%%    file:write_file([erlang:atom_to_list(TreeMod), ".erl"], Text),
+    Forms = scan_and_parse(Text, 1),
+    {ok, TreeMod, Binary} = compile:forms(Forms, [deterministic, no_line_info]),
+    {module, TreeMod} = code:load_binary(TreeMod, TreeMod, Binary).
+
+scan_and_parse(Text, Line) ->
+    case erl_scan:tokens([], Text, Line) of
+        {done, {ok, Tokens, NLine}, T} ->
+            {ok, Forms} = erl_parse:parse_form(Tokens),
+            [Forms | scan_and_parse(T, NLine)];
+        {more, _UpContinuation} ->
+            []
+    end.
