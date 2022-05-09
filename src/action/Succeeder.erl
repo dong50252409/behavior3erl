@@ -7,14 +7,15 @@
 %%--------------------------------------------------------------------
 %% export API
 %%--------------------------------------------------------------------
--export([tick/2]).
+-export([tick/3]).
 
 %%--------------------------------------------------------------------
 %% API functions
 %%--------------------------------------------------------------------
--spec tick(tree_node(), bt_state()) -> {bt_status(), bt_state()}.
-tick(_TreeNode, BTState) ->
-    {?BT_SUCCESS, BTState}.
+-spec tick(TreeNode :: tree_node(), BB :: blackboard(), State :: term()) ->
+    {BTStatus :: bt_status(), UpBB :: blackboard(), UpState :: term()}.
+tick(_TreeNode, BB, State) ->
+    {?BT_SUCCESS, BB, State}.
 
 %%--------------------------------------------------------------------
 %% Internal functions

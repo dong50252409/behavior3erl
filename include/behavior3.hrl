@@ -6,27 +6,30 @@
 -define(BT_RUNNING, 3).
 -define(BT_ERROR, 4).
 
--record(tree_node,{
+-type node_id() :: integer().
+
+-record(tree_node, {
     id :: node_id(),
     name :: module(),
     properties :: properties(),
     children :: [node_id()]
 }).
 
--type tree_node() :: tree_node().
-
--type node_id() :: integer().
-
--type bt_state() :: #{'$b3_running_title' => map(), '$b3_running_mod' => module(), '$b3_maps' => map(), term() => term()}.
+-type tree_node() :: #tree_node{}.
 
 -type properties() :: #{atom() => term()}.
 
--type bt_status() :: ?BT_SUCCESS|?BT_FAILURE|?BT_RUNNING|?BT_ERROR.
+-record(blackboard, {
+    tree_mod :: module(),
+    title :: string(),
+    root_id :: node_id(),
+    global_maps :: map(),
+    io :: pid()
+}).
 
--define(SKIP_MOD, [
-    mem_priority, mem_sequence, priority, sequence,
-    repeat_until_failure, repeat_until_success, repeater
-]).
+-type blackboard() :: #blackboard{}.
+
+-type bt_status() :: ?BT_SUCCESS|?BT_FAILURE|?BT_RUNNING|?BT_ERROR.
 
 -define(BT_DEBUG_LOG(IO, Format, Args), io:format(IO, unicode:characters_to_list(["~w:~w:~w:~w ~w [debug] ~p: ", Format, "~n"]), tuple_to_list(time()) ++ [erlang:system_time(millisecond) rem 1000, self(), ?MODULE | Args])).
 -define(BT_DEBUG_LOG(IO, Format), ?BT_DEBUG_LOG(IO, Format, [])).

@@ -1,8 +1,7 @@
 {application, behavior3, [
-    {description, "Behavior3 by erlang library"},
-    {vsn, "1.0.0"},
+    {description, "Behavior3 library for Erlang"},
+    {vsn, "2.0.0"},
     {registered, []},
-    {mod, {behavior3_app, []}},
     {applications, [kernel, stdlib]},
     {env, []},
     {modules, []},

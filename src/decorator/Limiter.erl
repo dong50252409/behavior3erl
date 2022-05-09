@@ -7,35 +7,36 @@
 %%--------------------------------------------------------------------
 %% export API
 %%--------------------------------------------------------------------
--export([open/2, tick/2, close/2]).
+-export([open/3, tick/3, close/3]).
 
 %%--------------------------------------------------------------------
 %% API functions
 %%--------------------------------------------------------------------
--spec open(tree_node(), bt_state()) -> bt_state().
-open(#{id := ID} = _TreeNode, BTState) ->
-    blackboard:set(i, 0, ID, BTState).
+-spec open(TreeNode :: tree_node(), BB :: blackboard(), State :: term()) -> {UpBB :: blackboard(), UpState :: term()}.
+open(#tree_node{id = ID}, BB, State) ->
+    {blackboard:set(i, 0, ID, BB), State}.
 
--spec tick(tree_node(), bt_state()) -> {bt_status(), bt_state()}.
-tick(#{id := ID, children := [ChildID], properties := #{max_loop := MaxLoop}} = _TreeNode, BTState) ->
-    case blackboard:get(i, ID, BTState) of
+-spec tick(TreeNode :: tree_node(), BB :: blackboard(), State :: term()) ->
+    {BTStatus :: bt_status(), UpBB :: blackboard(), UpState :: term()}.
+tick(#tree_node{id = ID, children = [ChildID], properties = #{max_loop := MaxLoop}}, BB, State) ->
+    case blackboard:get(i, ID, BB) of
         I when I < MaxLoop ->
-            case base_node:do_execute(ChildID, BTState) of
-                {BTStatus, BTState1} when BTStatus =:= ?BT_SUCCESS orelse BTStatus =:= ?BT_FAILURE ->
-                    BTState2 = blackboard:set(i, I + 1, ID, BTState1),
-                    {BTStatus, BTState2};
-                {BTStatus, BTState1} ->
-                    {BTStatus, BTState1}
+            case base_node:execute_child(ChildID, BB, State) of
+                {BTStatus, BB1, State1} when BTStatus == ?BT_SUCCESS orelse BTStatus == ?BT_FAILURE ->
+                    BB2 = blackboard:set(i, I + 1, ID, BB1),
+                    {BTStatus, BB2, State1};
+                {BTStatus, BB1, State1} ->
+                    {BTStatus, BB1, State1}
             end;
         _I ->
-            {?BT_FAILURE, BTState}
+            {?BT_FAILURE, BB, State}
     end;
-tick(_TreeNode, BTState) ->
-    {?BT_ERROR, BTState}.
+tick(_TreeNode, BB, State) ->
+    {?BT_ERROR, BB, State}.
 
--spec close(tree_node(), bt_state()) -> bt_state().
-close(#{id := ID} = _TreeNode, BTState) ->
-    blackboard:remove(i, ID, BTState).
+-spec close(TreeNode :: tree_node(), BB :: blackboard(), State :: term()) -> {UpBB :: blackboard(), UpState :: term()}.
+close(#tree_node{id = ID}, BB, State) ->
+    {blackboard:remove(i, ID, BB), State}.
 
 %%--------------------------------------------------------------------
 %% Internal functions

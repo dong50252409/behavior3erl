@@ -10,144 +10,107 @@
 %%--------------------------------------------------------------------
 %% export API
 %%--------------------------------------------------------------------
--export([execute/3]).
+-export([execute/2, execute_child/3]).
 
-%% Internal API
--export([do_execute/2, do_open/2, do_tick/2, do_close/2]).
+%% @doc
+%% 如果节点模块未标记开启，并且导出了open/3函数，则执行open/3函数，
+%% 如果节点模块已标记开启，则跳过
+-callback(open(TreeNode :: tree_node(), BB :: blackboard(), State :: term()) ->
+    {UpBB :: blackboard(), UpState :: term()}).
 
-%% 节点初始化
--callback(init(tree_node()) -> tree_node()).
+%% @doc
+%% 执行节点模块tick/3函数
+-callback(tick(TreeNode :: tree_node(), BB :: blackboard(), State :: term()) ->
+    {BTStatus :: bt_status(), UpBB :: blackboard(), UpState :: term()}).
 
-%% 开启节点
--callback(open(tree_node(), bt_state()) -> bt_state()).
+%% @doc
+%% 如果节点模块导出了close/3函数，则执行close/3函数
+-callback(close(TreeNode :: tree_node(), BB :: blackboard(), State :: term()) ->
+    {UpBB :: blackboard(), UpState :: term()}).
 
-%% 执行节点
--callback(tick(tree_node(), bt_state()) -> {bt_status(), bt_state()}).
+-optional_callbacks([open/3, close/3]).
 
-%% 关闭节点
--callback(close(tree_node(), bt_state()) -> bt_state()).
+-define(IS_OPEN, is_open).
 
--optional_callbacks([init/1, open/2, close/2]).
-
--define(IS_OPEN, '$is_open').
+-define(SKIP_MOD, [
+    'MemPriority', 'MemSequence', 'Priority', 'Sequence',
+    'Repeater', 'RepeatUntilFailure', 'RepeatUntilSuccess'
+]).
 
 %%--------------------------------------------------------------------
 %% API functions
 %%--------------------------------------------------------------------
-%% @doc 执行节点
-execute(TreeMod, Title, BTState) ->
-    NodeID = TreeMod:get_tree_by_title(Title),
-    UpBTState = blackboard:set_running_info(TreeMod, Title, BTState),
-    do_execute(NodeID, UpBTState).
+
+%% @doc 执行行为树
+-spec execute(BB :: blackboard(), State :: term()) -> {BTStatus :: bt_status(), UpBB :: blackboard(), UpState :: term()}.
+execute(BB, State) ->
+    RootNodeID = blackboard:get_root_node_id(BB),
+    execute_child(RootNodeID, BB, State).
+
+%% @doc 执行行为树子节点
+-spec execute_child(NodeID :: node_id(), BB :: blackboard(), State :: term()) ->
+    {BTStatus :: bt_status(), UpBB :: blackboard(), UpState :: term()}.
+execute_child(NodeID, BB, State) ->
+    TreeMod = blackboard:get_tree_mod(BB),
+    TreeNode = TreeMod:get_node(NodeID),
+    {BB1, State1} = do_open(TreeNode, BB, State),
+    case do_tick(TreeNode, BB1, State1) of
+        {?BT_RUNNING, BB2, State2} ->
+            {?BT_RUNNING, BB2, State2};
+        {BTStatus, BB2, State2} ->
+            {BB3, State3} = do_close(TreeNode, BB2, State2),
+            {BTStatus, BB3, State3}
+    end.
 
 %%--------------------------------------------------------------------
 %% Internal functions
 %%--------------------------------------------------------------------
-do_execute(NodeID, BTState) ->
-    TreeMode = blackboard:get_tree_mod(BTState),
-    TreeNode = TreeMode:get_node(NodeID),
-    BTState1 = do_open(TreeNode, BTState),
-    case do_tick(TreeNode, BTState1) of
-        {?BT_RUNNING, BTState2} ->
-            {?BT_RUNNING, BTState2};
-        {BTStatus, BTState2} ->
-            BTState3 = do_close(TreeNode, BTState2),
-            {BTStatus, BTState3}
+do_open(#tree_node{id = ID, name = Mod} = TreeNode, BB, State) ->
+    case blackboard:get(?IS_OPEN, ID, false, BB) of
+        true ->
+            {BB, State};
+        false ->
+            case erlang:function_exported(Mod, open, 3) of
+                true ->
+                    {BB1, State1} = Mod:open(TreeNode, BB, State),
+                    debug_log("do_open TreeNode:~tp~nBlackboard:~p~nState:~tp~n", TreeNode, BB1, State1);
+                false ->
+                    BB1 = BB, State1 = State
+            end,
+            BB2 = blackboard:set(?IS_OPEN, true, ID, BB1),
+            {BB2, State1}
     end.
+
+do_tick(#tree_node{name = Mod} = TreeNode, BB, State) ->
+    {BTStatus, BB1, State1} = Mod:tick(TreeNode, BB, State),
+    debug_log("do_tick TreeNode:~tp~nBlackboard:~p~nStatus:~w~nState:~tp~n", TreeNode, BB1, State1),
+    {BTStatus, BB1, State1}.
+
+do_close(#tree_node{id = ID, name = Mod} = TreeNode, BB, State) ->
+    case erlang:function_exported(Mod, close, 3) of
+        true ->
+            {BB1, State1} = Mod:close(TreeNode, State),
+            debug_log("do_close TreeNode:~tp~nBlackboard:~p~nState:~tp~n", TreeNode, BB1, State1);
+        false ->
+            BB1 = BB, State1 = State
+    end,
+    BB2 = blackboard:erase_node(ID, BB1),
+    {BB2, State1}.
 
 -ifndef(BT_DEBUG).
-
-%% @doc
-%% 如果树节点没有开启，并且有open/2函数实现，则执行open函数，
-%% 如果树节点已经开启，则跳过
-do_open(#tree_node{id = ID, name = Mod} = TreeNode, BTState) ->
-    case blackboard:get(?IS_OPEN, ID, false, BTState) of
-        true ->
-            BTState;
-        false ->
-            case erlang:function_exported(Mod, open, 2) of
-                true ->
-                    UpBTState = Mod:open(TreeNode, BTState);
-                false ->
-                    UpBTState = BTState
-            end,
-            blackboard:set(?IS_OPEN, true, ID, UpBTState)
-    end.
-
-%% @doc
-%% 执行树节点tick函数
-do_tick(#tree_node{name = Mod} = TreeNode, BTState) ->
-    Mod:tick(TreeNode, BTState).
-
-%% @doc
-%% 如果树节点有close/2函数实现，则执行close函数
-do_close(#tree_node{id = ID, name = Mod} = TreeNode, BTState) ->
-    case erlang:function_exported(Mod, close, 2) of
-        true ->
-            UpBTState = Mod:close(TreeNode, BTState);
-        false ->
-            UpBTState = BTState
-    end,
-    blackboard:erase_node(ID, UpBTState).
-
+debug_log(_Format, _TreeNode, _BB, _State) ->
+    ok.
 -else.
-
-do_open(#tree_node{id = ID, name = Mod} = TreeNode, BTState) ->
-    case blackboard:get(?IS_OPEN, ID, false, BTState) of
-        true ->
-            BTState;
-        false ->
-            case erlang:function_exported(Mod, open, 2) of
-                true ->
-                    UpBTState = Mod:open(TreeNode, BTState),
-                    case lists:member(Mod, ?SKIP_MOD) of
-                        true ->
-                            blackboard:set(?IS_OPEN, true, ID, BTState);
-                        false ->
-                            {IO, FinalBtState} = blackboard:get_log_file(UpBTState),
-                            ?BT_DEBUG_LOG(IO, "do_open Name:~w Blackboard:~w~nBTState:~tp~n", [
-                                Mod, blackboard:get_tree_maps(UpBTState), blackboard:erase_all_tree(UpBTState)
-                            ]),
-                            blackboard:set(?IS_OPEN, true, ID, FinalBtState)
-                    end;
-                false ->
-                    blackboard:set(?IS_OPEN, true, ID, BTState)
-            end
-    end.
-
-do_tick(#tree_node{name = Mod, children = Children} = TreeNode, BTState) ->
-    {UpBTStatus, UpBTState} = Mod:tick(TreeNode, BTState),
+debug_log(Format, #tree_node{name = Mod, children = Children} = TreeNode, BB, State) ->
     case lists:member(Mod, ?SKIP_MOD) of
         true ->
-            {UpBTStatus, UpBTState};
+            ok;
         false ->
-            {IO, FinalBtState} = blackboard:get_log_file(UpBTState),
-            TreeMod = blackboard:get_tree_mod(BTState),
-            ?BT_DEBUG_LOG(IO, "do_tick TreeNode:~w~nBlackboard:~w~nReply:~w~n", [
+            TreeMod = blackboard:get_tree_mod(BB),
+            ?BT_DEBUG_LOG(blackboard:get_io(BB), Format, [
                 TreeNode#tree_node{children = [(TreeMod:get_node(ChildId))#tree_node.name || ChildId <- Children]},
-                blackboard:get_tree_maps(UpBTState),
-                {UpBTStatus, blackboard:erase_all_tree(UpBTState)}
-            ]),
-            {UpBTStatus, FinalBtState}
+                blackboard:get_global_maps(BB), State
+            ])
     end.
-
-do_close(#tree_node{id = ID, name = Mod} = TreeNode, BTState) ->
-    case erlang:function_exported(Mod, close, 2) of
-        true ->
-            UpBTState = Mod:close(TreeNode, BTState),
-            case lists:member(Mod, ?SKIP_MOD) of
-                true ->
-                    blackboard:erase_node(ID, UpBTState);
-                false ->
-                    {IO, FinalBtState} = blackboard:get_log_file(UpBTState),
-                    ?BT_DEBUG_LOG(IO, "do_close Name:~w Blackboard:~w~nBTState:~w~n", [
-                        Mod, blackboard:get_tree_maps(UpBTState), blackboard:erase_all_tree(UpBTState)
-                    ]),
-                    blackboard:erase_node(ID, FinalBtState)
-            end;
-        false ->
-            blackboard:erase_node(ID, BTState)
-    end.
-
 -endif.
 

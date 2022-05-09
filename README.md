@@ -1,14 +1,14 @@
 中文
 =====
-Behavior3的erlang支持库
+Erlang的Behavior3运行库
 
 快速开始
 ----
-添加如下内容到**rebar.config**
+添加如下内容到`rebar.config`
 
     {deps, [
        ...
-       {behavior3, "1.0.0"}
+       {behavior3, "2.0.0"}
     ]}.
 
 编译
@@ -17,19 +17,29 @@ Behavior3的erlang支持库
     
 使用
 ----
-    ok = behavior_tree:load_tree_file("example.json"),
-    {ok, RootID} = behavior_tree:init_btree_by_title(<<"example_ai"/utf8>>),
-    {_BTStatus, _BTState1} = behavior_tree:execute(RootID, BTState = #{}).
+    Filename = "example.json",
+    BTTitle = <<"example_ai"/utf8>>, 
+    State = #{},
+    %% 执行这步后会产生大量垃圾，建议手动执行一次erlang:garbage_collect/0,1,2
+    TreeMod = behavior_tree:load_tree_file(Filename),
+    BB = blackboard:init_blackboard(TreeMod, BTTitle),
+    {_BTStatus, _BB1, _State1} = behavior_tree:execute(BB, State).
     
 
-调试信息
+调试
 ----
+执行以下步骤后，在行为树运行时将节点模块信息写入对应的`{BTTitle}_{PID}_bt.log`文件中
+
     {erl_opts, [
         {d, 'BT_DEBUG'}
     ]}.
 
     ./rebar3 clean -a
     ./rebar3 compile
+    
+热更新行为树
+----
+如果行为配置文件发生改变，可直接调用`behavior_tree:load_tree_file/1`进行加载，老的模块TreeMod可在适当的时候
 
 更多
 ----
@@ -58,15 +68,15 @@ Behavior3的erlang支持库
 English
 =====
 
-Behavior3 by erlang library
+Behavior3 library for Erlang
 
 Quickstart
 ----
-add to **rebar.config**
+add to `rebar.config`
 
     {deps, [
        ...
-       {behavior3erl, "1.0.0"}
+       {behavior3erl, "2.0.0"}
     ]}.
 
 Build
@@ -76,13 +86,19 @@ Build
    
 Usage
 ----
-    ok = behavior_tree:load_tree_file("example.json"),
-    {ok, RootID} = behavior_tree:init_btree_by_title(<<"example_ai"/utf8>>),
-    {_BTStatus, _BTState1} = behavior_tree:execute(RootID, BTState = #{}).
+    Filename = "example.json",
+    BTTitle = <<"example_ai"/utf8>>, 
+    State = #{},
+    %% This step generates a lot of garbage and a manual erlang:garbage_collect/0,1,2 is recommended
+    TreeMod = behavior_tree:load_tree_file(Filename), 
+    BB = blackboard:init_blackboard(TreeMod, BTTitle),
+    {_BTStatus, _BB1, _State1} = behavior_tree:execute(BB, State).
     
 
-debug
+DEBUG
 ----
+After performing the following steps, write the node module information to the corresponding '{BTTitle}_{PID}_bt.log' file while the behavior tree is running
+
     {erl_opts, [
         {d, 'BT_DEBUG'}
     ]}.

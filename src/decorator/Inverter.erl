@@ -7,23 +7,24 @@
 %%--------------------------------------------------------------------
 %% export API
 %%--------------------------------------------------------------------
--export([tick/2]).
+-export([tick/3]).
 
 %%--------------------------------------------------------------------
 %% API functions
 %%--------------------------------------------------------------------
--spec tick(tree_node(), bt_state()) -> {bt_status(), bt_state()}.
-tick(#{children := [ChildID]} = _TreeNode, BTState) ->
-    case base_node:do_execute(ChildID, BTState) of
-        {?BT_SUCCESS, BTState1} ->
-            {?BT_FAILURE, BTState1};
-        {?BT_FAILURE, BTState1} ->
-            {?BT_SUCCESS, BTState1};
-        {BTStatus, BTState1} ->
-            {BTStatus, BTState1}
+-spec tick(TreeNode :: tree_node(), BB :: blackboard(), State :: term()) ->
+    {BTStatus :: bt_status(), UpBB :: blackboard(), UpState :: term()}.
+tick(#tree_node{children = [ChildID]}, BB, State) ->
+    case base_node:execute_child(ChildID, BB, State) of
+        {?BT_SUCCESS, BB1, State1} ->
+            {?BT_FAILURE, BB1, State1};
+        {?BT_FAILURE, BB1, State1} ->
+            {?BT_SUCCESS, BB1, State1};
+        {BTStatus, BB1, State1} ->
+            {BTStatus, BB1, State1}
     end;
-tick(_TreeNode, BTState) ->
-    {?BT_ERROR, BTState}.
+tick(_TreeNode, BB, State) ->
+    {?BT_ERROR, BB, State}.
 
 %%--------------------------------------------------------------------
 %% Internal functions

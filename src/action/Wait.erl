@@ -7,28 +7,29 @@
 %%--------------------------------------------------------------------
 %% export API
 %%--------------------------------------------------------------------
--export([open/2, tick/2, close/2]).
+-export([open/3, tick/3, close/3]).
 
 %%--------------------------------------------------------------------
 %% API functions
 %%--------------------------------------------------------------------
--spec open(tree_node(), bt_state()) -> bt_state().
-open(#{id := ID}, BTState) ->
-    blackboard:set(start_time, erlang:system_time(millisecond), ID, BTState).
+-spec open(TreeNode :: tree_node(), BB :: blackboard(), State :: term()) -> {UpBB :: blackboard(), UpState :: term()}.
+open(#tree_node{id = ID}, BB, State) ->
+    {blackboard:set(start_time, erlang:system_time(millisecond), ID, BB), State}.
 
--spec tick(tree_node(), bt_state()) -> {bt_status(), bt_state()}.
-tick(#{id := ID, properties := #{milliseconds := EndTime}} = _TreeNode, BTState) ->
-    StartTime = blackboard:get(start_time, ID, BTState),
+-spec tick(TreeNode :: tree_node(), BB :: blackboard(), State :: term()) ->
+    {BTStatus :: bt_status(), UpBB :: blackboard(), UpState :: term()}.
+tick(#tree_node{id = ID, properties = #{milliseconds := EndTime}}, BB, State) ->
+    StartTime = blackboard:get(start_time, ID, BB),
     case erlang:system_time(millisecond) - StartTime > EndTime of
         true ->
-            {?BT_SUCCESS, BTState};
+            {?BT_SUCCESS, BB, State};
         false ->
-            {?BT_RUNNING, BTState}
+            {?BT_RUNNING, BB, State}
     end.
 
--spec close(tree_node(), bt_state()) -> bt_state().
-close(#{id := ID} = _TreeNode, BTState) ->
-    blackboard:remove(start_time, ID, BTState).
+-spec close(TreeNode :: tree_node(), BB :: blackboard(), State :: term()) -> {UpBB :: blackboard(), UpState :: term()}.
+close(#tree_node{id = ID}, BB, State) ->
+    {blackboard:remove(start_time, ID, BB), State}.
 
 %%--------------------------------------------------------------------
 %% Internal functions
