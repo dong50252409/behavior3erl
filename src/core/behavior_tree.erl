@@ -14,25 +14,27 @@
 %%--------------------------------------------------------------------
 %% API functions
 %%--------------------------------------------------------------------
-%% @doc 
+%% @doc
 %% 载入行为树文件
--spec load_tree_file(JSONConfig :: file:name_all()) -> {ok, TreeMod :: module()}|{error, Reason :: term()}.
+-spec load_tree_file(JSONConfig :: file:name_all()) ->
+    {ok, TreeMod :: module()} | {error, Reason :: term()}.
 load_tree_file(JSONConfig) ->
     do_load_tree_file(JSONConfig).
 
-%% @doc 
+%% @doc
 %% 执行行为树节点
--spec execute(BB :: blackboard(), State :: term()) -> {BTStatus :: bt_status(), UpBB :: blackboard(), UpState :: term()}.
+-spec execute(BB :: blackboard(), State :: term()) ->
+    {BTStatus :: bt_status(), UpBB :: blackboard(), UpState :: term()}.
 execute(BB, State) ->
     case base_node:execute(BB, State) of
         {?BT_RUNNING, BB1, State1} ->
             {?BT_RUNNING, BB1, State1};
         {BTStatus, BB1, State1} ->
-            State2 = blackboard:erase_tree(State1),
-            {BTStatus, BB1, State2}
+            BB2 = blackboard:erase_tree(BB1),
+            {BTStatus, BB2, State1}
     end.
 
-%% @doc 
+%% @doc
 %% 动态执行子节点
 -spec execute_child(NodeID :: node_id(), BB :: blackboard(), State :: term()) ->
     {BTStatus :: bt_status(), UpBB :: blackboard(), UpState :: term()}.
@@ -66,7 +68,8 @@ merge_trees([]) ->
     #{}.
 
 %% 解析行为树
-parse_trees(Trees) ->
+parse_trees(JSONTrem) ->
+    Trees = maps:get(<<"trees">>, JSONTrem),
     Nodes = merge_trees(Trees),
     parse_trees_1(Trees, 1, Nodes, #{}, []).
 
@@ -76,7 +79,9 @@ parse_trees_1([#{<<"title">> := Title, <<"root">> := Root} | T], UniqueID, Nodes
             parse_trees_1(T, UniqueID, Nodes, TreeNodes, [{Title, ID} | Titles]);
         #{} ->
             {UpUniqueID, UpTreeNodes} = parse_node(Root, UniqueID, Nodes, TreeNodes),
-            parse_trees_1(T, UpUniqueID, Nodes, UpTreeNodes, [{Title, (maps:get(Root, UpTreeNodes))#tree_node.id} | Titles])
+            parse_trees_1(T, UpUniqueID, Nodes, UpTreeNodes, [
+                {Title, (maps:get(Root, UpTreeNodes))#tree_node.id} | Titles
+            ])
     end;
 parse_trees_1([], _UniqueID, _Nodes, TreeNodes, Titles) ->
     {lists:sort([TreeNode || #tree_node{} = TreeNode <- maps:values(TreeNodes)]), Titles}.
@@ -134,7 +139,9 @@ gen_tree_mod(JSONConfig) ->
 load_beam_code(JSONConfig, TreeNodes, Titles) ->
     TreeMod = gen_tree_mod(JSONConfig),
 
-    Head = io_lib:format("-module(~w).\n\n-export([get_tree_by_title/1, get_node/1]).\n\n", [TreeMod]),
+    Head = io_lib:format("-module(~w).\n\n-export([get_tree_by_title/1, get_node/1]).\n\n", [
+        TreeMod
+    ]),
 
     Body1 = [
         [io_lib:format("get_tree_by_title(~w) -> ~w;\n", [Title, ID]) || {Title, ID} <- Titles],
@@ -142,12 +149,15 @@ load_beam_code(JSONConfig, TreeNodes, Titles) ->
     ],
 
     Body2 = [
-        [io_lib:format("get_node(~w) -> ~w;\n", [ID, TreeNode]) || #tree_node{id = ID} = TreeNode <- TreeNodes],
+        [
+            io_lib:format("get_node(~w) -> ~w;\n", [ID, TreeNode])
+            || #tree_node{id = ID} = TreeNode <- TreeNodes
+        ],
         "get_node(_) -> erlang:throw(node_not_exist).\n\n"
     ],
 
     Text = unicode:characters_to_list([Head, Body1, Body2]),
-%%    file:write_file([erlang:atom_to_list(TreeMod), ".erl"], Text),
+    %%    file:write_file([erlang:atom_to_list(TreeMod), ".erl"], Text),
     Forms = scan_and_parse(Text, 1),
     {ok, TreeMod, Binary} = compile:forms(Forms, [deterministic, no_line_info]),
     {module, TreeMod} = code:load_binary(TreeMod, TreeMod, Binary).
