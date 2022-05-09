@@ -39,7 +39,9 @@ Erlang的Behavior3运行库
     
 热更新行为树
 ----
-如果行为配置文件发生改变，可直接调用`behavior_tree:load_tree_file/1`进行加载，老的模块TreeMod可在适当的时候
+行为树配置文件发生改变时，可调用`behavior_tree:load_tree_file/1`进行生成加载，并返回一个新的模块名供后续使用。
+
+考虑到老的行为树模块会有已运行的行为树调用，自动清除可能会造成异常，老的行为树模块由使用者自行决定后续操作，可调用`behavior_tree:unload_tree_mod/1`清除。
 
 更多
 ----
@@ -56,14 +58,6 @@ Erlang的Behavior3运行库
 [（三）行为树应用之装饰节点](http://note.youdao.com/s/9Z6zI3YE)
 
 [（四）行为树应用之自定义节点](http://note.youdao.com/s/AcRrY8ig)
-
-[（五）行为树应用之加载行为树](http://note.youdao.com/s/DiqLf0ES)
-
-[（六）行为树应用之节点执行](http://note.youdao.com/s/PI3Wic5D)
-
-[（七）行为树应用之设计巡逻兵AI](http://note.youdao.com/s/HTCGTgAm)
-
-[（八）行为树应用之设计丧尸AI](http://note.youdao.com/s/3wKFxcTw)
 
 English
 =====
@@ -105,6 +99,12 @@ After performing the following steps, write the node module information to the c
 
     ./rebar3 clean -a
     ./rebar3 compile
+
+HotFix
+----
+When the behavior tree configuration file changes, call `behavior_tree:load_tree_file/1` to load the configuration file and return a new module name for future use
+
+Because the old behavior tree module has running behavior tree calls, automatic clearing may cause exceptions. Follow-up operations of the old behavior tree module are determined by users. You can call `behavior_tree:unload_tree_mod/1` to clear the behavior tree module
 
 More
 ----

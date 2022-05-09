@@ -9,7 +9,7 @@
 %%--------------------------------------------------------------------
 %% export API
 %%--------------------------------------------------------------------
--export([load_tree_file/1, execute/2, execute_child/3]).
+-export([load_tree_file/1, execute/2, execute_child/3, unload_tree_mod/1]).
 
 %%--------------------------------------------------------------------
 %% API functions
@@ -39,6 +39,11 @@ execute(BB, State) ->
 execute_child(NodeID, BB, State) ->
     base_node:execute_child(NodeID, BB, State).
 
+%% @doc
+%% 卸载已载入的行为树模块
+-spec unload_tree_mod(TreeMod :: module()) -> boolean().
+unload_tree_mod(TreeMod) ->
+    code:delete(TreeMod).
 %%--------------------------------------------------------------------
 %% Internal functions
 %%--------------------------------------------------------------------
