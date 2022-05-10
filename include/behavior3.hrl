@@ -21,10 +21,10 @@
 
 -record(blackboard, {
     tree_mod :: module(),
-    title :: string(),
+    title :: binary(),
     root_id :: node_id(),
     global_maps :: map(),
-    io :: pid()
+    io :: pid()|undefined
 }).
 
 -type blackboard() :: #blackboard{}.
