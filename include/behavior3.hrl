@@ -24,7 +24,7 @@
     title :: binary(),
     root_id :: node_id(),
     global_maps :: map(),
-    io :: pid()|undefined
+    io :: io:device()
 }).
 
 -type blackboard() :: #blackboard{}.

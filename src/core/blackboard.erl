@@ -12,7 +12,7 @@
 %%--------------------------------------------------------------------
 -export([init_blackboard/2]).
 -export([set/4, get/3, get/4, remove/3]).
--export([get_tree_mod/1, get_root_node_id/1, erase_node/2, erase_tree/1, get_global_maps/1, get_io/1]).
+-export([get_tree_mod/1, get_root_node_id/1, erase_node/2, erase_tree/1, get_global_maps/1, set_io/2, get_io/1]).
 
 %%--------------------------------------------------------------------
 %% API functions
@@ -23,7 +23,8 @@
 -spec init_blackboard(TreeMod :: module(), Title :: string()) -> BB :: blackboard().
 init_blackboard(TreeMod, Title) ->
     Title1 = unicode:characters_to_binary(Title),
-    do_init_blackboard(TreeMod, Title1).
+    RootID = TreeMod:get_tree_by_title(Title1),
+    #blackboard{tree_mod = TreeMod, title = Title1, root_id = RootID, global_maps = #{}, io = erlang:group_leader()}.
 
 %% @doc
 %% 设置节点变量
@@ -101,22 +102,17 @@ get_global_maps(#blackboard{global_maps = GlobalMaps}) ->
     GlobalMaps.
 
 %% @doc
+%% 设置IO
+%% 可用于重定向调试日志输出位置，默认erlang:group_leader()
+-spec set_io(IO :: io:device(), BB :: blackboard()) -> UpBB :: blackboard().
+set_io(IO, BB) ->
+    BB#blackboard{io = IO}.
+
+%% @doc
 %% 获取IO
--spec get_io(BB :: blackboard()) -> IO :: pid()|port().
+-spec get_io(BB :: blackboard()) -> IO :: io:device().
 get_io(#blackboard{io = IO}) ->
     IO.
 %%--------------------------------------------------------------------
 %% Internal functions
 %%--------------------------------------------------------------------
-
--ifndef(BT_DEBUG).
-do_init_blackboard(TreeMod, Title) ->
-    RootID = TreeMod:get_tree_by_title(Title),
-    #blackboard{tree_mod = TreeMod, title = Title, root_id = RootID, global_maps = #{}}.
--else.
-do_init_blackboard(TreeMod, Title) ->
-    RootID = TreeMod:get_tree_by_title(Title),
-    Filename = erlang:iolist_to_binary([Title, "_", lists:droplast(erlang:tl(erlang:pid_to_list(self()))), "_bt.log"]),
-    {ok, IO} = file:open(Filename, [append, {encoding, utf8}]),
-    #blackboard{tree_mod = TreeMod, title = Title, root_id = RootID, global_maps = #{}, io = IO}.
--endif.
