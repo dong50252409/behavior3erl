@@ -83,7 +83,7 @@ do_open(#tree_node{id = ID, name = Mod} = TreeNode, BB, State) ->
 
 do_tick(#tree_node{name = Mod} = TreeNode, BB, State) ->
     {BTStatus, BB1, State1} = Mod:tick(TreeNode, BB, State),
-    debug_log("do_tick TreeNode:~tp~nBlackboard:~p~nStatus:~w~nState:~tp~n", TreeNode, BB1, State1),
+    debug_log("do_tick TreeNode:~tp~nBlackboard:~p~nStatusAndState:~tp~n", TreeNode, BB1, {BTStatus, State1}),
     {BTStatus, BB1, State1}.
 
 do_close(#tree_node{id = ID, name = Mod} = TreeNode, BB, State) ->
@@ -98,10 +98,10 @@ do_close(#tree_node{id = ID, name = Mod} = TreeNode, BB, State) ->
     {BB2, State1}.
 
 -ifndef(BT_DEBUG).
-debug_log(_Format, _TreeNode, _BB, _State) ->
+debug_log(_Format, _TreeNode, _BB, _Other) ->
     ok.
 -else.
-debug_log(Format, #tree_node{name = Mod, children = Children} = TreeNode, BB, State) ->
+debug_log(Format, #tree_node{name = Mod, children = Children} = TreeNode, BB, Other) ->
     case lists:member(Mod, ?SKIP_MOD) of
         true ->
             ok;
@@ -109,7 +109,7 @@ debug_log(Format, #tree_node{name = Mod, children = Children} = TreeNode, BB, St
             TreeMod = blackboard:get_tree_mod(BB),
             ?BT_DEBUG_LOG(blackboard:get_io(BB), Format, [
                 TreeNode#tree_node{children = [(TreeMod:get_node(ChildId))#tree_node.name || ChildId <- Children]},
-                blackboard:get_global_maps(BB), State
+                blackboard:get_global_maps(BB), Other
             ])
     end.
 -endif.
