@@ -28,12 +28,11 @@ Erlang的Behavior3运行库
 
 调试
 ----
-执行以下步骤后，在行为树运行时将节点模块信息写入对应的`{BTTitle}_{PID}_bt.log`文件中
+添加`{d,'BT_DEBUG'}`到`rebar.config`文件中，默认调试信息输出到控制台，可调用`blackboard:set_io/2`重定向日志输出位置
 
     {erl_opts, [
         {d, 'BT_DEBUG'}
     ]}.
-
     ./rebar3 clean -a
     ./rebar3 compile
     
@@ -91,12 +90,11 @@ Usage
 
 DEBUG
 ----
-After performing the following steps, write the node module information to the corresponding '{BTTitle}_{PID}_bt.log' file while the behavior tree is running
+Add `{d,'BT_DEBUG'}` to `rebar.config` and default debug information is output to the console by calling `blackboard:set_IO/2` to redirect the log output location
 
     {erl_opts, [
         {d, 'BT_DEBUG'}
     ]}.
-
     ./rebar3 clean -a
     ./rebar3 compile
 
