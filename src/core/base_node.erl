@@ -66,7 +66,7 @@ do_open(#tree_node{id = ID, name = Mod} = TreeNode, BB, State) ->
             case erlang:function_exported(Mod, open, 3) of
                 true ->
                     {BB1, State1} = Mod:open(TreeNode, BB, State),
-                    debug_log("do_open TreeNode:~tp~nBlackboard:~p~nState:~tp~n", TreeNode, BB1, State1);
+                    debug_log("do_open TreeNode:~160tp~nBlackboard:~160p~nState:~160tp~n", TreeNode, BB1, State1);
                 false ->
                     BB1 = BB, State1 = State
             end,
@@ -76,14 +76,14 @@ do_open(#tree_node{id = ID, name = Mod} = TreeNode, BB, State) ->
 
 do_tick(#tree_node{name = Mod} = TreeNode, BB, State) ->
     {BTStatus, BB1, State1} = Mod:tick(TreeNode, BB, State),
-    debug_log("do_tick TreeNode:~tp~nBlackboard:~p~nStatusAndState:~tp~n", TreeNode, BB1, {BTStatus, State1}),
+    debug_log("do_tick TreeNode:~160tp~nBlackboard:~160p~nStatusAndState:~160tp~n", TreeNode, BB1, {BTStatus, State1}),
     {BTStatus, BB1, State1}.
 
 do_close(#tree_node{id = ID, name = Mod} = TreeNode, BB, State) ->
     case erlang:function_exported(Mod, close, 3) of
         true ->
             {BB1, State1} = Mod:close(TreeNode, BB, State),
-            debug_log("do_close TreeNode:~tp~nBlackboard:~p~nState:~tp~n", TreeNode, BB1, State1);
+            debug_log("do_close TreeNode:~160tp~nBlackboard:~160p~nState:~160tp~n", TreeNode, BB1, State1);
         false ->
             BB1 = BB, State1 = State
     end,
