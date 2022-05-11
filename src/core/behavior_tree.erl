@@ -166,8 +166,13 @@ load_beam_code(JSONConfig, TreeNodes, Titles, Options) ->
 
     Body2 = [
         [
-            io_lib:format("get_node(~w) -> ~w;\n", [ID, TreeNode])
-            || #tree_node{id = ID} = TreeNode <- TreeNodes
+            case code:ensure_loaded(Name) of
+                {module, _} ->
+                    io_lib:format("get_node(~w) -> ~w;\n", [ID, TreeNode]);
+                {error, What} ->
+                    error({node_not_implement, Name, What})
+            end
+            || #tree_node{id = ID, name = Name} = TreeNode <- TreeNodes
         ],
         "get_node(_) -> erlang:throw(node_not_exist).\n\n"
     ],
