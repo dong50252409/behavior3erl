@@ -9,8 +9,9 @@
 %%--------------------------------------------------------------------
 %% export API
 %%--------------------------------------------------------------------
--export([load_tree_file/1, execute/2, execute_child/3, unload_tree_mod/1]).
+-export([load_tree_file/1, load_tree_file/2, execute/2, execute_child/3, unload_tree_mod/1]).
 
+-type option() :: dump_tree_mod|compile:option().
 %%--------------------------------------------------------------------
 %% API functions
 %%--------------------------------------------------------------------
@@ -19,7 +20,12 @@
 -spec load_tree_file(JSONConfig :: file:name_all()) ->
     {ok, TreeMod :: module()} | {error, Reason :: term()}.
 load_tree_file(JSONConfig) ->
-    do_load_tree_file(JSONConfig).
+    load_tree_file(JSONConfig, []).
+
+-spec load_tree_file(JSONConfig :: file:name_all(), Options :: [option()]) ->
+    {ok, TreeMod :: module()} | {error, Reason :: term()}.
+load_tree_file(JSONConfig, Options) ->
+    do_load_tree_file(JSONConfig, Options).
 
 %% @doc
 %% 执行行为树节点
@@ -49,12 +55,12 @@ unload_tree_mod(TreeMod) ->
 %%--------------------------------------------------------------------
 %% Internal functions
 %%--------------------------------------------------------------------
-do_load_tree_file(JSONConfig) ->
+do_load_tree_file(JSONConfig, Options) ->
     case file:read_file(JSONConfig) of
         {ok, Content} ->
             JSONTerm = jsx:decode(Content, [return_maps]),
             {TreeNodes, Titles} = parse_trees(JSONTerm),
-            {module, TreeMod} = load_beam_code(JSONConfig, TreeNodes, Titles),
+            {module, TreeMod} = load_beam_code(JSONConfig, TreeNodes, Titles, Options),
             {ok, TreeMod};
         {error, Reason} ->
             ?BT_ERROR_LOG("Error:~w Reason:~w JsonConfig:~ts", [error, Reason, JSONConfig]),
@@ -68,8 +74,8 @@ merge_trees([]) ->
     #{}.
 
 %% 解析行为树
-parse_trees(JSONTrem) ->
-    Trees = maps:get(<<"trees">>, JSONTrem),
+parse_trees(JSONTerm) ->
+    Trees = maps:get(<<"trees">>, JSONTerm),
     Nodes = merge_trees(Trees),
     parse_trees_1(Trees, 1, Nodes, #{}, []).
 
@@ -136,16 +142,14 @@ gen_tree_mod(JSONConfig) ->
     list_to_atom(unicode:characters_to_list(["$b3_", RootName, "_", I])).
 
 %% 动态编译
-load_beam_code(JSONConfig, TreeNodes, Titles) ->
+load_beam_code(JSONConfig, TreeNodes, Titles, Options) ->
     TreeMod = gen_tree_mod(JSONConfig),
 
-    Head = io_lib:format("-module(~w).\n\n-export([get_tree_by_title/1, get_node/1]).\n\n", [
-        TreeMod
-    ]),
+    Head = io_lib:format("-module(~w).\n\n-export([get_root_id/1, get_node/1]).\n\n", [TreeMod]),
 
     Body1 = [
-        [io_lib:format("get_tree_by_title(~w) -> ~w;\n", [Title, ID]) || {Title, ID} <- Titles],
-        "get_tree_by_title(_) -> erlang:throw(tree_not_exist).\n\n"
+        [io_lib:format("get_root_id(~w) -> ~w;\n", [Title, ID]) || {Title, ID} <- Titles],
+        "get_root_id(_) -> erlang:throw(tree_not_exist).\n\n"
     ],
 
     Body2 = [
@@ -157,9 +161,14 @@ load_beam_code(JSONConfig, TreeNodes, Titles) ->
     ],
 
     Text = unicode:characters_to_list([Head, Body1, Body2]),
-    %%    file:write_file([erlang:atom_to_list(TreeMod), ".erl"], Text),
+    case proplists:is_defined(dump_tree_mod, Options) of
+        true ->
+            file:write_file([erlang:atom_to_list(TreeMod), ".erl"], Text);
+        false ->
+            ok
+    end,
     Forms = scan_and_parse(Text, 1),
-    {ok, TreeMod, Binary} = compile:forms(Forms, [deterministic, no_line_info]),
+    {ok, TreeMod, Binary} = compile:forms(Forms, [deterministic, no_line_info | Options]),
     {module, TreeMod} = code:load_binary(TreeMod, TreeMod, Binary).
 
 scan_and_parse(Text, Line) ->

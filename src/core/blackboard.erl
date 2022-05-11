@@ -23,7 +23,7 @@
 -spec init_blackboard(TreeMod :: module(), Title :: string()) -> BB :: blackboard().
 init_blackboard(TreeMod, Title) ->
     Title1 = unicode:characters_to_binary(Title),
-    RootID = TreeMod:get_tree_by_title(Title1),
+    RootID = TreeMod:get_root_id(Title1),
     #blackboard{tree_mod = TreeMod, title = Title1, root_id = RootID, global_maps = #{}, io = erlang:group_leader()}.
 
 %% @doc
