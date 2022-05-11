@@ -82,7 +82,7 @@ do_tick(#tree_node{name = Mod} = TreeNode, BB, State) ->
 do_close(#tree_node{id = ID, name = Mod} = TreeNode, BB, State) ->
     case erlang:function_exported(Mod, close, 3) of
         true ->
-            {BB1, State1} = Mod:close(TreeNode, State),
+            {BB1, State1} = Mod:close(TreeNode, BB, State),
             debug_log("do_close TreeNode:~tp~nBlackboard:~p~nState:~tp~n", TreeNode, BB1, State1);
         false ->
             BB1 = BB, State1 = State
