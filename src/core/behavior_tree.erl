@@ -11,7 +11,11 @@
 %%--------------------------------------------------------------------
 -export([load_tree_file/1, load_tree_file/2, execute/2, execute_child/3, unload_tree_mod/1]).
 
--type option() :: dump_tree_mod|compile:option().
+-type tree_mod() :: {tree_mod, module()}. % 指定生成行为树模块名。默认自动生成，但可能存在原子超过系统限制导致进程崩溃
+-type dump() :: dump. % 将生成的行为树模块内容转储到文件中
+
+-type option() :: tree_mod()|dump()|compile:option().
+
 %%--------------------------------------------------------------------
 %% API functions
 %%--------------------------------------------------------------------
@@ -61,7 +65,7 @@ do_load_tree_file(JSONConfig, Options) ->
         {ok, Content} ->
             JSONTerm = jsx:decode(Content, [return_maps]),
             {TreeNodes, Titles} = parse_trees(JSONTerm),
-            {module, TreeMod} = load_beam_code(JSONConfig, TreeNodes, Titles, Options),
+            TreeMod = load_beam_code(JSONConfig, TreeNodes, Titles, Options),
             {ok, TreeMod};
         {error, Reason} ->
             ?BT_ERROR_LOG("Error:~w Reason:~w JsonConfig:~ts", [error, Reason, JSONConfig]),
@@ -144,7 +148,14 @@ gen_tree_mod(JSONConfig) ->
 
 %% 动态编译
 load_beam_code(JSONConfig, TreeNodes, Titles, Options) ->
-    TreeMod = gen_tree_mod(JSONConfig),
+    case proplists:is_defined(tree_mod, Options) of
+        true ->
+            TreeMod = proplists:get_value(tree_mod, Options),
+            Options1 = lists:delete({tree_mod, TreeMod}, Options);
+        false ->
+            TreeMod = gen_tree_mod(JSONConfig),
+            Options1 = Options
+    end,
 
     Head = io_lib:format("-module(~w).\n\n-export([get_root_id/1, get_node/1]).\n\n", [TreeMod]),
 
@@ -162,15 +173,17 @@ load_beam_code(JSONConfig, TreeNodes, Titles, Options) ->
     ],
 
     Text = unicode:characters_to_list([Head, Body1, Body2]),
-    case proplists:is_defined(dump_tree_mod, Options) of
+    case proplists:is_defined(dump, Options1) of
         true ->
-            file:write_file([erlang:atom_to_list(TreeMod), ".erl"], Text);
+            file:write_file([erlang:atom_to_list(TreeMod), ".erl"], Text),
+            Options2 = lists:delete(dump, Options1);
         false ->
-            ok
+            Options2 = Options1
     end,
     Forms = scan_and_parse(Text, 1),
-    {ok, TreeMod, Binary} = compile:forms(Forms, [deterministic, no_line_info | Options]),
-    {module, TreeMod} = code:load_binary(TreeMod, TreeMod, Binary).
+    {ok, Module, Binary} = compile:forms(Forms, [deterministic, no_line_info | Options2]),
+    {module, Module} = code:load_binary(Module, Module, Binary),
+    Module.
 
 scan_and_parse(Text, Line) ->
     case erl_scan:tokens([], Text, Line) of
