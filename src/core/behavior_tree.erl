@@ -16,7 +16,7 @@
 %% API functions
 %%--------------------------------------------------------------------
 %% @doc
-%% 载入行为树文件
+%% 载入行为树
 -spec load_tree_file(JSONConfig :: file:name_all()) ->
     {ok, TreeMod :: module()} | {error, Reason :: term()}.
 load_tree_file(JSONConfig) ->
@@ -28,7 +28,7 @@ load_tree_file(JSONConfig, Options) ->
     do_load_tree_file(JSONConfig, Options).
 
 %% @doc
-%% 执行行为树节点
+%% 执行行为树节
 -spec execute(BB :: blackboard(), State :: term()) ->
     {BTStatus :: bt_status(), UpBB :: blackboard(), UpState :: term()}.
 execute(BB, State) ->
@@ -36,22 +36,23 @@ execute(BB, State) ->
         {?BT_RUNNING, BB1, State1} ->
             {?BT_RUNNING, BB1, State1};
         {BTStatus, BB1, State1} ->
-            BB2 = blackboard:erase_tree(BB1),
+            BB2 = blackboard:erase_tree_nodes(BB1),
             {BTStatus, BB2, State1}
     end.
 
 %% @doc
-%% 动态执行子节点
+%% 执行行为树节点
 -spec execute_child(NodeID :: node_id(), BB :: blackboard(), State :: term()) ->
     {BTStatus :: bt_status(), UpBB :: blackboard(), UpState :: term()}.
 execute_child(NodeID, BB, State) ->
     base_node:execute_child(NodeID, BB, State).
 
 %% @doc
-%% 卸载已载入的行为树模块
+%% 卸载行为树模块
 -spec unload_tree_mod(TreeMod :: module()) -> boolean().
 unload_tree_mod(TreeMod) ->
     code:delete(TreeMod).
+
 %%--------------------------------------------------------------------
 %% Internal functions
 %%--------------------------------------------------------------------

@@ -12,19 +12,12 @@
 %%--------------------------------------------------------------------
 -export([execute/2, execute_child/3]).
 
-%% @doc
-%% 如果节点模块未标记开启，并且导出了open/3函数，则执行open/3函数，
-%% 如果节点模块已标记开启，则跳过
 -callback(open(TreeNode :: tree_node(), BB :: blackboard(), State :: term()) ->
     {UpBB :: blackboard(), UpState :: term()}).
 
-%% @doc
-%% 执行节点模块tick/3函数
 -callback(tick(TreeNode :: tree_node(), BB :: blackboard(), State :: term()) ->
     {BTStatus :: bt_status(), UpBB :: blackboard(), UpState :: term()}).
 
-%% @doc
-%% 如果节点模块导出了close/3函数，则执行close/3函数
 -callback(close(TreeNode :: tree_node(), BB :: blackboard(), State :: term()) ->
     {UpBB :: blackboard(), UpState :: term()}).
 
@@ -47,7 +40,7 @@ execute(BB, State) ->
     RootNodeID = blackboard:get_root_node_id(BB),
     execute_child(RootNodeID, BB, State).
 
-%% @doc 执行行为树子节点
+%% @doc 执行行为树节点
 -spec execute_child(NodeID :: node_id(), BB :: blackboard(), State :: term()) ->
     {BTStatus :: bt_status(), UpBB :: blackboard(), UpState :: term()}.
 execute_child(NodeID, BB, State) ->

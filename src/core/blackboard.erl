@@ -12,19 +12,21 @@
 %%--------------------------------------------------------------------
 -export([init_blackboard/2]).
 -export([set/4, get/3, get/4, remove/3]).
--export([get_tree_mod/1, get_root_node_id/1, erase_node/2, erase_tree/1, get_global_maps/1, set_io/2, get_io/1]).
-
+-export([get_tree_mod/1, get_root_node_id/1, erase_node/2, erase_tree_nodes/1, get_global_maps/1, set_io/2, get_io/1]).
 %%--------------------------------------------------------------------
 %% API functions
 %%--------------------------------------------------------------------
 
 %% @doc
-%% 初始化blackboard
+%% 初始化黑板
 -spec init_blackboard(TreeMod :: module(), Title :: string()) -> BB :: blackboard().
 init_blackboard(TreeMod, Title) ->
     Title1 = unicode:characters_to_binary(Title),
     RootID = TreeMod:get_root_id(Title1),
-    #blackboard{tree_mod = TreeMod, title = Title1, root_id = RootID, global_maps = #{}, io = erlang:group_leader()}.
+    #blackboard{
+        tree_mod = TreeMod, title = Title1, root_id = RootID,
+        global_maps = #{}, io = erlang:group_leader()
+    }.
 
 %% @doc
 %% 设置节点变量
@@ -85,15 +87,15 @@ get_root_node_id(#blackboard{root_id = RootID}) ->
     RootID.
 
 %% @doc
-%% 擦除节点信息
+%% 擦除节点所有信息
 -spec erase_node(NodeID :: node_id(), BB :: blackboard()) -> UpBB :: blackboard().
 erase_node(NodeID, #blackboard{global_maps = GlobalMaps} = BB) ->
     BB#blackboard{global_maps = maps:remove(NodeID, GlobalMaps)}.
 
 %% @doc
 %% 擦除行为树所有节点信息
--spec erase_tree(BB :: blackboard()) -> UpBB :: blackboard().
-erase_tree(BB) ->
+-spec erase_tree_nodes(BB :: blackboard()) -> UpBB :: blackboard().
+erase_tree_nodes(BB) ->
     BB#blackboard{global_maps = #{}}.
 
 %% @doc
