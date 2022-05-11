@@ -82,7 +82,7 @@ merge_trees([]) ->
 parse_trees(JSONTerm) ->
     Trees = maps:get(<<"trees">>, JSONTerm),
     Nodes = merge_trees(Trees),
-    parse_trees_1(Trees, 1, Nodes, #{}, []).
+    parse_trees_1(Trees, 0, Nodes, #{}, []).
 
 parse_trees_1([#{<<"title">> := Title, <<"root">> := Root} | T], UniqueID, Nodes, TreeNodes, Titles) ->
     case TreeNodes of
@@ -130,7 +130,7 @@ get_children_ids([ID | T], Nodes) ->
         #{ID := #tree_node{id = TreeNodeID}} ->
             [TreeNodeID | get_children_ids(T, Nodes)];
         #{ID := ChildRootID} ->
-            get_children_ids([ChildRootID], Nodes)
+            get_children_ids([ChildRootID | T], Nodes)
     end;
 get_children_ids([], _Nodes) ->
     [].
