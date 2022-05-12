@@ -187,7 +187,7 @@ load_beam_code(JSONConfig, TreeNodes, Titles, Options) ->
     end,
     Forms = scan_and_parse(Text, 1),
     {ok, Module, Binary} = compile:forms(Forms, [deterministic, no_line_info | Options2]),
-    {module, Module} = code:load_binary(Module, Module, Binary),
+    {module, Module} = code:load_binary(Module, [], Binary),
     Module.
 
 scan_and_parse(Text, Line) ->
