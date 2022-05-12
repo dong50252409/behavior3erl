@@ -8,7 +8,7 @@ Erlang的行为树运行库，使用 [behavior3editor](https://github.com/behavi
 
     {deps, [
        ...
-       {behavior3, "2.0.0"}
+       {behavior3, "2.0.1"}
     ]}.
 
 编译
@@ -70,7 +70,7 @@ add to `rebar.config`
 
     {deps, [
        ...
-       {behavior3erl, "2.0.0"}
+       {behavior3erl, "2.0.1"}
     ]}.
 
 Build
