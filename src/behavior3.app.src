@@ -1,6 +1,6 @@
 {application, behavior3, [
-    {description, "Behavior3 library for Erlang"},
-    {vsn, "2.0.0"},
+    {description, "Behavior3 runtime library for Erlang (Behavior Trees for Erlang)"},
+    {vsn, "2.0.1"},
     {registered, []},
     {applications, [kernel, stdlib]},
     {env, []},

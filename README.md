@@ -1,6 +1,6 @@
 中文
 =====
-Erlang的Behavior3运行库
+Erlang的行为树运行库，使用 [behavior3editor](https://github.com/behavior3/behavior3editor) 编辑生成行为树
 
 快速开始
 ----
@@ -42,13 +42,14 @@ Erlang的Behavior3运行库
 
 考虑到老的行为树模块会有已运行的行为树调用，自动清除可能会造成异常，老的行为树模块由使用者自行决定后续操作，可调用`behavior_tree:unload_tree_mod/1`清除。
 
-更多
+一个DEMO
 ----
-[behavior3editor](https://github.com/behavior3/behavior3editor)
+[rogue_adventure](https://github.com/dong50252409/rogue_adventure)
 
-[behavior3go](https://github.com/magicsea/behavior3go)
 
-#### Behavior3使用系列文章：
+Behavior3使用系列文章：
+----
+里面的代码实例是1.0.0版本的，各位主要看看概念就好
 
 [（一）行为树应用之行为树简介](http://note.youdao.com/s/77bGugj9)
 
@@ -61,7 +62,7 @@ Erlang的Behavior3运行库
 English
 =====
 
-Behavior3 library for Erlang
+Erlang runtime library behavior tree, use [behavior3editor](https://github.com/behavior3/behavior3editor) to edit generated tree
 
 Quickstart
 ----
@@ -103,10 +104,3 @@ HotFix
 When the behavior tree configuration file changes, call `behavior_tree:load_tree_file/1` to load the configuration file and return a new module name for future use
 
 Because the old behavior tree module has running behavior tree calls, automatic clearing may cause exceptions. Follow-up operations of the old behavior tree module are determined by users. You can call `behavior_tree:unload_tree_mod/1` to clear the behavior tree module
-
-More
-----
-
-[behavior3editor](https://github.com/behavior3/behavior3editor)
-
-[behavior3go](https://github.com/magicsea/behavior3go)
