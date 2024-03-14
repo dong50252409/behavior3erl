@@ -11,7 +11,7 @@
 %% export API
 %%--------------------------------------------------------------------
 -export([init_blackboard/2]).
--export([set/4, get/3, get/4, remove/3]).
+-export([set/4, set_global/3, get/3, get_global/2, get/4, get_global/3, remove/3, remove_global/2]).
 -export([get_tree_mod/1, get_root_node_id/1, erase_node/2, erase_tree_nodes/1, get_global_maps/1, set_io/2, get_io/1]).
 %%--------------------------------------------------------------------
 %% API functions
@@ -42,6 +42,12 @@ set(Key, Value, NodeID, #blackboard{global_maps = GlobalMaps} = BB) ->
     end.
 
 %% @doc
+%% 设置全局变量
+-spec set_global(Key :: term(), Value :: term(), BB :: blackboard()) -> UpBB :: blackboard().
+set_global(Key, Value, BB) ->
+    set(Key, Value, 0, BB).
+
+%% @doc
 %% 获取节点变量
 -spec get(Key :: term(), NodeID :: node_id(), BB :: blackboard()) -> Value :: term()|undefined.
 get(Key, NodeID, #blackboard{global_maps = GlobalMaps}) ->
@@ -51,6 +57,12 @@ get(Key, NodeID, #blackboard{global_maps = GlobalMaps}) ->
         #{} ->
             undefined
     end.
+
+%% @doc
+%% 获取全局变量
+-spec get_global(Key :: term(), BB :: blackboard()) -> Value :: term()|undefined.
+get_global(Key, BB) ->
+    get(Key, 0, BB).
 
 %% @doc
 %% 获取节点变量，不存在则返回Default
@@ -64,6 +76,12 @@ get(Key, NodeID, Default, BB) ->
     end.
 
 %% @doc
+%% 获取全局变量，不存在则返回Default
+-spec get_global(Key :: term(), Default :: term(), BB :: blackboard()) -> Value :: term()|undefined.
+get_global(Key, Default, BB) ->
+    get(Key, 0, Default, BB).
+
+%% @doc
 %% 删除节点变量
 -spec remove(Key :: term(), NodeID :: node_id(), BB :: blackboard()) -> UpBB :: blackboard().
 remove(Key, NodeID, #blackboard{global_maps = GlobalMaps} = BB) ->
@@ -73,6 +91,12 @@ remove(Key, NodeID, #blackboard{global_maps = GlobalMaps} = BB) ->
         #{} ->
             BB
     end.
+
+%% @doc
+%% 删除节点变量
+-spec remove_global(Key :: term(), BB :: blackboard()) -> UpBB :: blackboard().
+remove_global(Key, BB) ->
+    remove(Key, 0, BB).
 
 %% @doc
 %% 获取当前运行中行为树模块名
